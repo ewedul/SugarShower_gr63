@@ -3,12 +3,19 @@ package nl.saxion.game.sugarshower;
 import com.badlogic.gdx.Input;
 import nl.saxion.gameapp.GameApp;
 import nl.saxion.gameapp.screens.ScalableGameScreen;
+import nl.saxion.app.CsvReader;
+import nl.saxion.app.SaxionApp;
+
+import java.util.ArrayList;
+
+import static com.badlogic.gdx.graphics.Color.WHITE;
 
 public class YourGameScreen extends ScalableGameScreen {
 
     public static final int BOWL_SIZE = 150;
     public static final int BOWL_SPEED = 500;
     Bowl bowl;
+    ArrayList<Ingredient> ingredientsList = new ArrayList<>();
 
     public YourGameScreen() {
         super(800, 800);
@@ -42,6 +49,10 @@ public class YourGameScreen extends ScalableGameScreen {
 
         }
 
+        //read the ingredients from csv file
+        ingredientsList = readCSV("src/main/resources/ingredients.csv");
+
+
 
 
 
@@ -51,6 +62,9 @@ public class YourGameScreen extends ScalableGameScreen {
         GameApp.startSpriteRendering();
         GameApp.drawTexture("background", 0, 0, getWorldWidth(), getWorldHeight());
 
+        // test that shows the CSV file is read into the arraylist correctly
+        GameApp.drawText("basic", ingredientsList.get(3).name,20,20, WHITE);
+
         GameApp.drawTexture("bowl", bowl.x, bowl.y, BOWL_SIZE, BOWL_SIZE);
         GameApp.endSpriteRendering();
 
@@ -59,12 +73,7 @@ public class YourGameScreen extends ScalableGameScreen {
 
 
     public void handlePlayerInput(float delta) {
-//        if (GameApp.isKeyPressed(Input.Keys.UP)) {
-//            bowl.y = bowl.y + BOWL_SPEED * delta;
-//
-//        } else if (GameApp.isKeyPressed(Input.Keys.DOWN)) {
-//            bowl.y = bowl.y - BOWL_SPEED * delta;
-//        }
+
         if (GameApp.isKeyPressed(Input.Keys.LEFT)) {
             bowl.x = bowl.x - BOWL_SPEED * delta;
 
@@ -76,10 +85,32 @@ public class YourGameScreen extends ScalableGameScreen {
         bowl.x = GameApp.clamp(bowl.x, 0, getWorldWidth() - BOWL_SIZE);
     }
 
+
+
+
+
     @Override
     public void hide() {
         GameApp.disposeTexture("bowl");
         GameApp.disposeTexture("background");
-
+        GameApp.disposeFont("basic");
     }
+
+
+    public ArrayList<Ingredient> readCSV(String filename){
+        ArrayList<Ingredient> ingredients = new ArrayList<>();
+        CsvReader reader = new CsvReader(filename);
+        reader.skipRow();
+        reader.setSeparator(',');
+        while(reader.loadRow()){
+            Ingredient newIngredient = new Ingredient();
+            newIngredient.name = reader.getString(0);
+            newIngredient.filename = reader.getString(1);
+            ingredients.add(newIngredient);
+
+        }
+        return ingredients;
+    }
+
+
 }

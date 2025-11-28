@@ -2,10 +2,9 @@ package nl.saxion.game.sugarshower;
 
 public class Ingredient {
     String name;
+    String filename;
     float x;
     float y;
-    float width;
-    float height;
-    String filePath;
+
 
 }

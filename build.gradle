@@ -8,10 +8,15 @@ version = '1.0.0'
 
 repositories {
     mavenCentral()
+    flatDir {
+        dirs 'libs'
+    }
 }
 
 dependencies {
     implementation group: 'io.gitlab.evertduipmans', name: 'saxiongameapp', version: 'latest.release'
+    implementation fileTree('libs')
+
 }
 
 application {
