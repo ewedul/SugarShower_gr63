@@ -5,6 +5,11 @@ import nl.saxion.gameapp.GameApp;
 import nl.saxion.gameapp.screens.ScalableGameScreen;
 import nl.saxion.app.CsvReader;
 import nl.saxion.app.SaxionApp;
+import com.badlogic.gdx.Input;
+import nl.saxion.gameapp.GameApp;
+import nl.saxion.gameapp.screens.ScalableGameScreen;
+import java.util.ArrayList;
+import java.util.Random;
 
 import java.util.ArrayList;
 
@@ -14,8 +19,17 @@ public class YourGameScreen extends ScalableGameScreen {
 
     public static final int BOWL_SIZE = 150;
     public static final int BOWL_SPEED = 500;
+    public static final int INGREDIENT_SIZE = 80;
     Bowl bowl;
-    ArrayList<Ingredient> ingredientsList = new ArrayList<>();
+
+    // candy's code for the rain mechanism
+    ArrayList<Ingredient> ingredients;
+    Random random;
+    float spawnTimer;
+    float spawnInterval = 1.0f; // Spawn every 1 second
+
+    // Available ingredients
+    ArrayList<String> ingredientTypes = readCSV("src/main/resources/ingredients.csv");
 
     public YourGameScreen() {
         super(800, 800);
@@ -28,46 +42,57 @@ public class YourGameScreen extends ScalableGameScreen {
     @Override
     public void show() {
         bowl = new Bowl();
-        bowl.x = 0;
-        bowl.y = 0;
+        bowl.x = getWorldWidth() / 2 - BOWL_SIZE / 2;
+        bowl.y = 50; // Position bowl at the bottom
 
-        GameApp.addTexture("background", "textures/candy-bg.png");
+        ingredients = new ArrayList<>();
+        random = new Random();
+        spawnTimer = 0;
+
+        // Load textures
+        GameApp.addTexture("bowl", "textures/bowl_03.png");
+        GameApp.addTexture("background", "textures/pink-bg.png");
+
+        // Load ingredient textures
+        GameApp.addTexture("milk", "textures/ingredients/milk.png");
+        GameApp.addTexture("coffeebean", "textures/ingredients/coffeebean.png");
+        GameApp.addTexture("matchapowder", "textures/ingredients/matchapowder.png");
+        GameApp.addTexture("butter", "textures/ingredients/butter.png");
+        GameApp.addTexture("flour", "textures/ingredients/flour.png");
+        GameApp.addTexture("sugar", "textures/ingredients/sugar.png");
+
+
     }
 
     @Override
     public void render(float delta) {
 
         super.render(delta);
-        GameApp.addTexture("bowl", "textures/bowl_01.png");
-
-
 
         handlePlayerInput(delta);
+        updateIngredients(delta);
+        spawnIngredients(delta);
+        checkCollisions();
 
+        // Draw ingredients
         if (GameApp.isKeyJustPressed(Input.Keys.ESCAPE)){
             GameApp.switchScreen("MainMenuScreen");
 
         }
-
-        //read the ingredients from csv file
-        ingredientsList = readCSV("src/main/resources/ingredients.csv");
-
-
-
-
-
 
         // Draw elements
         GameApp.clearScreen();
         GameApp.startSpriteRendering();
         GameApp.drawTexture("background", 0, 0, getWorldWidth(), getWorldHeight());
 
-        // test that shows the CSV file is read into the arraylist correctly
-        GameApp.drawText("basic", ingredientsList.get(3).name,20,20, WHITE);
+        for (Ingredient ingredient : ingredients) {
+            if (ingredient.active) {
+                GameApp.drawTexture(ingredient.type, ingredient.x, ingredient.y, INGREDIENT_SIZE, INGREDIENT_SIZE);
+            }
+        }
 
         GameApp.drawTexture("bowl", bowl.x, bowl.y, BOWL_SIZE, BOWL_SIZE);
         GameApp.endSpriteRendering();
-
 
     }
 
@@ -85,29 +110,85 @@ public class YourGameScreen extends ScalableGameScreen {
         bowl.x = GameApp.clamp(bowl.x, 0, getWorldWidth() - BOWL_SIZE);
     }
 
+    private void spawnIngredients(float delta) {
+        spawnTimer += delta;
+
+        if (spawnTimer >= spawnInterval) {
+            // Create new ingredient
+            String randomType = ingredientTypes.get(SaxionApp.getRandomValueBetween(0,ingredientTypes.size()));
+            Ingredient newIngredient = new Ingredient(randomType, 100 + random.nextInt(100)); // Speed between 100-200
+
+            // Random x position
+            newIngredient.x = random.nextInt((int)getWorldWidth() - INGREDIENT_SIZE);
+            newIngredient.y = getWorldHeight(); // Start from top
+
+            ingredients.add(newIngredient);
+            spawnTimer = 0;
+        }
+    }
+
+    private void updateIngredients(float delta) {
+        // Update position of all active ingredients
+        for (int i = ingredients.size() - 1; i >= 0; i--) {
+            Ingredient ingredient = ingredients.get(i);
+
+            if (ingredient.active) {
+                ingredient.y -= ingredient.speed * delta;
+
+                // Remove ingredients that fall off the bottom of the screen
+                if (ingredient.y < -INGREDIENT_SIZE) {
+                    ingredients.remove(i);
+                }
+            }
+        }
+    }
+
+
+    private void checkCollisions() {
+        for (Ingredient ingredient : ingredients) {
+            if (ingredient.active && isColliding(ingredient, bowl)) {
+                ingredient.active = false; // "Collect" the ingredient
+                // Here you can add score or handle ingredient collection
+                System.out.println("Collected: " + ingredient.type);
+            }
+        }
+    }
+
+    private boolean isColliding(Ingredient ingredient, Bowl bowl) {
+        return ingredient.x < bowl.x + BOWL_SIZE &&
+                ingredient.x + INGREDIENT_SIZE > bowl.x &&
+                ingredient.y < bowl.y + BOWL_SIZE &&
+                ingredient.y + INGREDIENT_SIZE > bowl.y;
+    }
+
 
 
 
 
     @Override
     public void hide() {
+
+        //clean up textures
         GameApp.disposeTexture("bowl");
         GameApp.disposeTexture("background");
-        GameApp.disposeFont("basic");
+
+
+        // Clean up ingredient textures
+        for (String type : ingredientTypes) {
+            GameApp.disposeTexture(type);
+        }
+
+        ingredients.clear();
     }
 
-
-    public ArrayList<Ingredient> readCSV(String filename){
-        ArrayList<Ingredient> ingredients = new ArrayList<>();
+    // read the ingredients.csv into an arraylist
+    public ArrayList<String> readCSV(String filename){
+        ArrayList<String> ingredients = new ArrayList<>();
         CsvReader reader = new CsvReader(filename);
         reader.skipRow();
         reader.setSeparator(',');
         while(reader.loadRow()){
-            Ingredient newIngredient = new Ingredient();
-            newIngredient.name = reader.getString(0);
-            newIngredient.filename = reader.getString(1);
-            ingredients.add(newIngredient);
-
+            ingredients.add(reader.getString(0));
         }
         return ingredients;
     }
