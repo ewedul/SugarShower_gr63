@@ -11,6 +11,7 @@ public class MainMenuScreen extends ScalableGameScreen {
 
     @Override
     public void show() {
+        GameApp.addTexture("mainmenu", "textures/mainmenu.png");
         GameApp.addFont("basic", "fonts/basic.ttf", 50);
     }
 
@@ -24,14 +25,16 @@ public class MainMenuScreen extends ScalableGameScreen {
         }
 
         // Render the main menu
-        GameApp.clearScreen("black");
+        GameApp.clearScreen();
         GameApp.startSpriteRendering();
-        GameApp.drawTextCentered("basic", "Start Game (press enter)", getWorldWidth()/2, getWorldHeight()/2, "amber-500");
+        GameApp.drawTexture("mainmenu", 0, 0, getWorldWidth(), getWorldHeight());
+        GameApp.drawTextCentered("basic", "Press ENTER to Start", getWorldWidth()/2, 150, "amber-500");
         GameApp.endSpriteRendering();
     }
 
     @Override
     public void hide() {
         GameApp.disposeFont("basic");
+        GameApp.disposeTexture("mainmenu");
     }
 }
