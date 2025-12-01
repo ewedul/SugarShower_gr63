@@ -22,7 +22,7 @@ public class YourGameScreen extends ScalableGameScreen {
     public static final int INGREDIENT_SIZE = 80;
     Bowl bowl;
 
-    // candy's code for the rain mechanism
+    // Variables for falling ingredients
     ArrayList<Ingredient> ingredients;
     Random random;
     float spawnTimer;
@@ -31,13 +31,16 @@ public class YourGameScreen extends ScalableGameScreen {
     // Available ingredients
     ArrayList<String> ingredientTypes = readCSV("src/main/resources/ingredients.csv");
 
+    // Variables for correction ingredients
+    ArrayList<String> neededIngredients = new ArrayList<>();
+    ArrayList<String> caughtIngredients = new ArrayList<>();
+    int lives = 3;
+    int score = 0;
+
     public YourGameScreen() {
         super(800, 800);
     }
 
-//trytry
-    //hewwo
-    //Nhi
 
     @Override
     public void show() {
@@ -53,13 +56,11 @@ public class YourGameScreen extends ScalableGameScreen {
         GameApp.addTexture("bowl", "textures/bowl_03.png");
         GameApp.addTexture("background", "textures/pink-bg.png");
 
-        // Load ingredient textures
-        GameApp.addTexture("milk", "textures/ingredients/milk.png");
-        GameApp.addTexture("coffeebean", "textures/ingredients/coffeebean.png");
-        GameApp.addTexture("matchapowder", "textures/ingredients/matchapowder.png");
-        GameApp.addTexture("butter", "textures/ingredients/butter.png");
-        GameApp.addTexture("flour", "textures/ingredients/flour.png");
-        GameApp.addTexture("sugar", "textures/ingredients/sugar.png");
+        // Load ingredient textures using helper method
+        for (String ingredientName : ingredientTypes) {
+            String texturePath = getTexturePath(ingredientName);
+            GameApp.addTexture(ingredientName, texturePath);
+        }
 
 
     }
@@ -163,8 +164,6 @@ public class YourGameScreen extends ScalableGameScreen {
 
 
 
-
-
     @Override
     public void hide() {
 
@@ -193,5 +192,9 @@ public class YourGameScreen extends ScalableGameScreen {
         return ingredients;
     }
 
+    // helper method
+    public String getTexturePath(String ingredientName) {
+        return "textures/ingredients/" + ingredientName + ".png";
+    }
 
 }

@@ -4,9 +4,6 @@ import nl.saxion.game.sugarshower.YourGameScreen;
 import nl.saxion.game.sugarshower.MainMenuScreen;
 import nl.saxion.gameapp.GameApp;
 
-
-
-
 public class Main {
     public static void main(String[] args) {
         // Add screens

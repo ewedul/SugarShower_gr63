@@ -1,0 +1,16 @@
+phase,level,nameItem,ing1,ing2,ing3,ing4,ing5,ing6,ing7,ing8
+1,1,milkshake,milk,icecream,,,,,
+1,2,coffee,milk,coffeebean,sugar,water,,,,
+1,3,matcha,milk,matchapowder,sugar,water,,,,
+1,4,boba_tea,milk,tea,sugar,boba,,,,
+1,5,hot_chocolate,milk,cocoa,sugar,whipped_cream,,,,
+2,6,cookies,butter,flour,sugar,egg,icing,,,
+2,7,blueberry_muffin,butter,flour,sugar,egg,blueberry,,,
+2,8,brownies,butter,flour,sugar,egg,cocoa,,,
+2,9,lemon_macaron,butter,flour,sugar,egg,lemon,almonds,,
+2,10,chocolate_macaron,butter,flour,sugar,egg,cocoa,almonds,,
+3,11,carrot_cake,butter,flour,sugar,egg,carrot,icing,carrot_decoration,
+3,12,chocolate_cake,butter,flour,sugar,egg,cocoa,chocolate_icing,choco_chips,
+3,13,redvelvet_cake,butter,flour,sugar,egg,raspberry,icing,flowers,
+3,14,birthday_cake,butter,flour,sugar,egg,vanilla,icing,candles,sprinkles
+3,15,wedding_cake,butter,flour,sugar,egg,vanilla,icing,flowers,sparkles

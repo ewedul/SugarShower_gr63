@@ -1,7 +1,7 @@
-name, filename
-coffeebean, textures/ingredients/coffeebean.png
-milk, textures/ingredients/milk.png
-butter, textures/ingredients/butter.png
-flour, textures/ingredients/flour.png
-sugar, textures/ingredients/sugar.png
-matchapowder, textures/ingredients/matchapowder.png
+name
+coffeebean
+milk
+butter
+flour
+sugar
+matchapowder
