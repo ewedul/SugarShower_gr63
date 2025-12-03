@@ -17,6 +17,9 @@ import static com.badlogic.gdx.graphics.Color.WHITE;
 
 public class YourGameScreen extends ScalableGameScreen {
 
+    // current level variable
+    int currentLevel;
+
     public static final int BOWL_SIZE = 150;
     public static final int BOWL_SPEED = 500;
     public static final int INGREDIENT_SIZE = 80;
@@ -24,15 +27,25 @@ public class YourGameScreen extends ScalableGameScreen {
 
     // Variables for falling ingredients
     ArrayList<Ingredient> ingredients;
+
+
     Random random;
     float spawnTimer;
     float spawnInterval = 1.0f; // Spawn every 1 second
 
+    //
+
+    ArrayList<Recipe> recipesArrayList = readCSVRecipes("src/main/resources/recipes.csv");
+
+    int countIngredientsCaught;
+
     // Available ingredients
-    ArrayList<String> ingredientTypes = readCSV("src/main/resources/ingredients.csv");
+    ArrayList<String> ingredientTypes = readCSVIngredients("src/main/resources/ingredients.csv");
+
+
 
     // Variables for correction ingredients
-    ArrayList<String> neededIngredients = new ArrayList<>();
+    ArrayList<String> neededIngredients = recipesArrayList.get(currentLevel).recipeIngredientList;
     ArrayList<String> caughtIngredients = new ArrayList<>();
     int lives = 3;
     int score = 0;
@@ -44,6 +57,9 @@ public class YourGameScreen extends ScalableGameScreen {
 
     @Override
     public void show() {
+        //Keeps track of the level
+        currentLevel = 1;
+
         bowl = new Bowl();
         bowl.x = getWorldWidth() / 2 - BOWL_SIZE / 2;
         bowl.y = 50; // Position bowl at the bottom
@@ -52,9 +68,17 @@ public class YourGameScreen extends ScalableGameScreen {
         random = new Random();
         spawnTimer = 0;
 
+        countIngredientsCaught = 0;
+
+        ArrayList<Recipe> recipesArrayList = readCSVRecipes("src/main/resources/recipes.csv");
+
+
         // Load textures
         GameApp.addTexture("bowl", "textures/bowl_03.png");
         GameApp.addTexture("background", "textures/pink-bg.png");
+        GameApp.addFont("roboto", "fonts/Roboto_SemiBold.ttf", 20);
+
+
 
         // Load ingredient textures using helper method
         for (String ingredientName : ingredientTypes) {
@@ -93,6 +117,13 @@ public class YourGameScreen extends ScalableGameScreen {
         }
 
         GameApp.drawTexture("bowl", bowl.x, bowl.y, BOWL_SIZE, BOWL_SIZE);
+        GameApp.drawText("roboto", "score: " + countIngredientsCaught, 30,getWorldHeight()-50,"black");
+
+        // print the current level and the level recipe
+        GameApp.drawText("roboto", "Current level:" + recipesArrayList.get(currentLevel-1).level, 30,getWorldHeight()-100,"black");
+        GameApp.drawText("roboto", "Recipe to make: " + recipesArrayList.get(currentLevel-1).name, 30,getWorldHeight()-150,"black");
+        GameApp.drawText("roboto", "Ingredients needed to make: " + recipesArrayList.get(currentLevel-1).name + " " +  recipesArrayList.get(currentLevel-1).recipeIngredientList.toString() , 30,getWorldHeight()-200,"black");
+
         GameApp.endSpriteRendering();
 
     }
@@ -151,6 +182,19 @@ public class YourGameScreen extends ScalableGameScreen {
                 ingredient.active = false; // "Collect" the ingredient
                 // Here you can add score or handle ingredient collection
                 System.out.println("Collected: " + ingredient.type);
+
+                // Check if caught ingredient is in the level's needed ingredient list
+                // removes the ingredient from the list if it matches
+                if (neededIngredients.contains(ingredient.type)){
+                    neededIngredients.remove(ingredient.type);
+                }
+                // Once all the ingredients have been caught it raises the level and creates the next
+                // neededIngredients list
+                if (neededIngredients.isEmpty()){
+                    currentLevel++;
+                    neededIngredients = recipesArrayList.get(currentLevel-1).recipeIngredientList;
+
+                }
             }
         }
     }
@@ -163,13 +207,12 @@ public class YourGameScreen extends ScalableGameScreen {
     }
 
 
-
     @Override
     public void hide() {
-
         //clean up textures
         GameApp.disposeTexture("bowl");
         GameApp.disposeTexture("background");
+        GameApp.disposeTexture("roboto");
 
 
         // Clean up ingredient textures
@@ -180,8 +223,8 @@ public class YourGameScreen extends ScalableGameScreen {
         ingredients.clear();
     }
 
-    // read the ingredients.csv into an arraylist
-    public ArrayList<String> readCSV(String filename){
+    // Read the ingredients.csv into an arraylist
+    public ArrayList<String> readCSVIngredients(String filename){
         ArrayList<String> ingredients = new ArrayList<>();
         CsvReader reader = new CsvReader(filename);
         reader.skipRow();
@@ -194,7 +237,38 @@ public class YourGameScreen extends ScalableGameScreen {
 
     // helper method
     public String getTexturePath(String ingredientName) {
+
         return "textures/ingredients/" + ingredientName + ".png";
     }
+
+
+
+    // Read the recipes.csv into an arraylist of Recipes
+    public ArrayList<Recipe> readCSVRecipes(String filename){
+        ArrayList<Recipe> recipes = new ArrayList<>();
+        CsvReader reader = new CsvReader(filename);
+        reader.skipRow();
+        reader.setSeparator(',');
+        while(reader.loadRow()){
+            Recipe newRecipe = new Recipe();
+            newRecipe.phase =(reader.getInt(0));
+            newRecipe.level =(reader.getInt(1));
+            newRecipe.name = (reader.getString(2));
+            newRecipe.recipeIngredientList.add(reader.getString(3));
+            newRecipe.recipeIngredientList.add(reader.getString(4));
+            newRecipe.recipeIngredientList.add(reader.getString(5));
+            newRecipe.recipeIngredientList.add(reader.getString(6));
+            newRecipe.recipeIngredientList.add(reader.getString(7));
+            newRecipe.recipeIngredientList.add(reader.getString(8));
+            newRecipe.recipeIngredientList.add(reader.getString(9));
+
+            //remove the ingredients called NULL
+            newRecipe.recipeIngredientList.removeIf(ingredient -> ingredient.equals("NULL"));
+
+            recipes.add(newRecipe);
+        }
+        return recipes;
+    }
+
 
 }
