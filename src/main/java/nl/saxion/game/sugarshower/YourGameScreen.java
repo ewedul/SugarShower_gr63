@@ -272,7 +272,7 @@ public class YourGameScreen extends ScalableGameScreen {
         reader.skipRow();
         reader.setSeparator(',');
         while(reader.loadRow()){
-            ingredients.add(reader.getString(0));
+            ingredients.add(reader.getString(0).trim());
         }
         return ingredients;
     }
