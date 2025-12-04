@@ -11,7 +11,7 @@ import java.util.Random;
 public class YourGameScreen extends ScalableGameScreen {
 
     //GAME SETTINGS
-    public static final int BOWL_SIZE = 150;
+    public static final int BOWL_SIZE = 100;
     public static final int BOWL_SPEED = 500;
     public static final int INGREDIENT_SIZE = 80;
 
@@ -128,7 +128,7 @@ public class YourGameScreen extends ScalableGameScreen {
         // print the current level and the level recipe
         GameApp.drawText("roboto", "Current level:" + recipesArrayList.get(currentLevel-1).level, 30,getWorldHeight()-100,"black");
         GameApp.drawText("roboto", "Recipe to make: " + recipesArrayList.get(currentLevel-1).name, 30,getWorldHeight()-150,"black");
-        GameApp.drawText("roboto", "Ingredients needed to make: " + recipesArrayList.get(currentLevel-1).name + " " +  recipesArrayList.get(currentLevel-1).recipeIngredientList.toString() , 30,getWorldHeight()-200,"black");
+        //GameApp.drawText("roboto", "Ingredients needed to make: " + recipesArrayList.get(currentLevel-1).name + " " +  recipesArrayList.get(currentLevel-1).recipeIngredientList.toString() , 30,getWorldHeight()-200,"black");
 
         GameApp.endSpriteRendering();
 
@@ -153,7 +153,7 @@ public class YourGameScreen extends ScalableGameScreen {
         float textY = popupY + popupH - 140;
 
         for (String ing : neededIngredients) {
-            GameApp.drawText("roboto", "- " + ing, textX, textY, "black");
+            GameApp.drawText("roboto", "- " + ing, textX+150, textY, "black");
             textY -= 30;
         }
     }
