@@ -101,7 +101,7 @@ public class YourGameScreen extends ScalableGameScreen {
 
         // Draw ingredients
         if (GameApp.isKeyJustPressed(Input.Keys.ESCAPE)){
-            GameApp.switchScreen("MainMenuScreen");
+            GameApp.switchScreen("GameOverScreen");
 
         }
 
