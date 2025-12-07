@@ -14,17 +14,4 @@ public class AudioControl {
         return muteMode ? 0f : volume;
     }
 
-
-//   Testing feature
-//    public static void playMusic(String audioName, boolean flag, float volume) {
-//        GameApp.playMusic(audioName, flag, AudioControl.getVolume(volume));
-//    }
-//    public static void playSound(String audioName, float number){
-//        if(!AudioControl.muteMode) {
-//            GameApp.playSound(audioName, number);
-//        }else{
-//            GameApp.playSound(audioName,0f);
-//        }
-//    }
-
 }
