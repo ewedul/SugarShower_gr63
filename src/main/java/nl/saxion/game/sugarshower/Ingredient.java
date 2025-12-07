@@ -7,7 +7,6 @@ public class Ingredient {
     float speed;
     String type;
     boolean active;
-    String filename;
 
     public Ingredient(String type, float speed) {
         this.type = type;

@@ -102,6 +102,7 @@ public class YourGameScreen extends ScalableGameScreen {
         // Draw ingredients
         if (GameApp.isKeyJustPressed(Input.Keys.ESCAPE)){
             GameApp.switchScreen("GameOverScreen");
+            //Link to GameOver screen until we figure out the level system - Nhi
 
         }
 
@@ -294,6 +295,7 @@ public class YourGameScreen extends ScalableGameScreen {
             newRecipe.phase =(reader.getInt(0));
             newRecipe.level =(reader.getInt(1));
             newRecipe.name = (reader.getString(2));
+
             newRecipe.recipeIngredientList.add(reader.getString(3));
             newRecipe.recipeIngredientList.add(reader.getString(4));
             newRecipe.recipeIngredientList.add(reader.getString(5));
@@ -301,6 +303,7 @@ public class YourGameScreen extends ScalableGameScreen {
             newRecipe.recipeIngredientList.add(reader.getString(7));
             newRecipe.recipeIngredientList.add(reader.getString(8));
             newRecipe.recipeIngredientList.add(reader.getString(9));
+            newRecipe.recipeIngredientList.add(reader.getString(10));
 
             //remove the ingredients called NULL
             newRecipe.recipeIngredientList.removeIf(ingredient -> ingredient.equals("NULL"));
