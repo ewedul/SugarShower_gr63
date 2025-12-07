@@ -19,7 +19,6 @@ public class YourGameScreen extends ScalableGameScreen {
     Bowl bowl;
     ArrayList<Ingredient> ingredients;
     Random random;
-    LevelManager levelManager;
 
     float spawnTimer;
     float spawnInterval = 1.0f; // -- Spawn every 1 second
@@ -66,9 +65,6 @@ public class YourGameScreen extends ScalableGameScreen {
         bowl.y = 50; // Position bowl at the bottom
 
         //INGREDIENT SYSTEM
-        levelManager = new LevelManager();
-        levelManager.loadAllRecipesToManager("src/main/resources/recipes.csv");
-
         ingredients = new ArrayList<>();
         random = new Random();
         spawnTimer = 0;
@@ -190,9 +186,9 @@ public class YourGameScreen extends ScalableGameScreen {
 
         if (spawnTimer >= spawnInterval) {
             // Create new ingredient
-            ArrayList<String> currentPhaseIngredients = levelManager.getCurrentPhaseIngredients();
-            String randomType = currentPhaseIngredients.get(SaxionApp.getRandomValueBetween(0,currentPhaseIngredients.size()));
+            String randomType = ingredientTypes.get(SaxionApp.getRandomValueBetween(0,ingredientTypes.size()));
             Ingredient newIngredient = new Ingredient(randomType, 100 + random.nextInt(100)); // Speed between 100-200
+
 
             // Random x position
             newIngredient.x = random.nextInt((int)getWorldWidth() - INGREDIENT_SIZE);
