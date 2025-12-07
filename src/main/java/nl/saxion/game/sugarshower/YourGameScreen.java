@@ -19,11 +19,13 @@ public class YourGameScreen extends ScalableGameScreen {
     Bowl bowl;
     ArrayList<Ingredient> ingredients;
     Random random;
+    LevelManager levelManager;
 
     float spawnTimer;
     float spawnInterval = 1.0f; // -- Spawn every 1 second
 
     //CSV DATA
+
     ArrayList<Recipe> recipesArrayList = readCSVRecipes("src/main/resources/recipes.csv");
     ArrayList<String> ingredientTypes = readCSVIngredients("src/main/resources/ingredients.csv");
 
@@ -64,6 +66,9 @@ public class YourGameScreen extends ScalableGameScreen {
         bowl.y = 50; // Position bowl at the bottom
 
         //INGREDIENT SYSTEM
+        levelManager = new LevelManager();
+        levelManager.loadAllRecipesToManager("src/main/resources/recipes.csv");
+
         ingredients = new ArrayList<>();
         random = new Random();
         spawnTimer = 0;
@@ -76,7 +81,7 @@ public class YourGameScreen extends ScalableGameScreen {
         GameApp.addTexture("background", "textures/pink-bg.png");
         GameApp.addFont("roboto", "fonts/Roboto_SemiBold.ttf", 20);
 
-        // Load ingredient textures using helper method
+        // Load all ingredient images using helper method
         for (String ingredientName : ingredientTypes) {
             String texturePath = getTexturePath(ingredientName);
             GameApp.addTexture(ingredientName, texturePath);
@@ -99,11 +104,10 @@ public class YourGameScreen extends ScalableGameScreen {
             checkCollisions();
         }
 
-        // Draw ingredients
+        // Escape button to exit
         if (GameApp.isKeyJustPressed(Input.Keys.ESCAPE)){
             GameApp.switchScreen("GameOverScreen");
-            //Link to GameOver screen until we figure out the level system - Nhi
-
+            //Link to GameOver screen for now until we figure out the level system - Nhi
         }
 
         // Draw elements
@@ -186,7 +190,8 @@ public class YourGameScreen extends ScalableGameScreen {
 
         if (spawnTimer >= spawnInterval) {
             // Create new ingredient
-            String randomType = ingredientTypes.get(SaxionApp.getRandomValueBetween(0,ingredientTypes.size()));
+            ArrayList<String> currentPhaseIngredients = levelManager.getCurrentPhaseIngredients();
+            String randomType = currentPhaseIngredients.get(SaxionApp.getRandomValueBetween(0,currentPhaseIngredients.size()));
             Ingredient newIngredient = new Ingredient(randomType, 100 + random.nextInt(100)); // Speed between 100-200
 
             // Random x position
@@ -230,9 +235,7 @@ public class YourGameScreen extends ScalableGameScreen {
                 // neededIngredients list
                 if (neededIngredients.isEmpty()){
                     currentLevel++;
-                    neededIngredients = new ArrayList<>(
-                            recipesArrayList.get(currentLevel - 1).recipeIngredientList
-                    );
+                    neededIngredients = new ArrayList<>(recipesArrayList.get(currentLevel - 1).recipeIngredientList);
 
                     memorizeMode = true;
                     memorizeTime = 3f;

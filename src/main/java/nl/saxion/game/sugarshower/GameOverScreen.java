@@ -86,9 +86,9 @@ public class GameOverScreen extends ScalableGameScreen {
     @Override
     public void hide() {
 
-        GameApp.stopMusic("GameOver-sound");
+        GameApp.stopMusic("gameover-music");
         GameApp.disposeTexture("background");
         GameApp.disposeFont("GameOver");
-        GameApp.disposeMusic("GameOver-sound");
+        GameApp.disposeMusic("gameover-music");
     }
 }
