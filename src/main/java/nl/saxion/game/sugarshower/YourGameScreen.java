@@ -185,15 +185,26 @@ public class YourGameScreen extends ScalableGameScreen {
         spawnTimer += delta;
 
         if (spawnTimer >= spawnInterval) {
-            // Create new ingredient
-            String randomType = ingredientTypes.get(SaxionApp.getRandomValueBetween(0,ingredientTypes.size()));
-            Ingredient newIngredient = new Ingredient(randomType, 100 + random.nextInt(100)); // Speed between 100-200
+            String randomType;
 
+            // 60% chance to spawn needed ingredient, 40% chance random
+            if (random.nextFloat() < 0.6f && !neededIngredients.isEmpty()) {
+                // Spawn a needed ingredient (that hasn't been caught yet)
+                ArrayList<String> stillNeeded = new ArrayList<>(neededIngredients);
 
-            // Random x position
+                if (!stillNeeded.isEmpty()) {
+                    randomType = stillNeeded.get(random.nextInt(stillNeeded.size()));
+                } else {
+                    randomType = ingredientTypes.get(SaxionApp.getRandomValueBetween(0, ingredientTypes.size()));
+                }
+            } else {
+                // Spawn any random ingredient
+                randomType = ingredientTypes.get(SaxionApp.getRandomValueBetween(0, ingredientTypes.size()));
+            }
+
+            Ingredient newIngredient = new Ingredient(randomType, 100 + random.nextInt(100));
             newIngredient.x = random.nextInt((int)getWorldWidth() - INGREDIENT_SIZE);
-            newIngredient.y = getWorldHeight(); // Start from top
-
+            newIngredient.y = getWorldHeight();
             ingredients.add(newIngredient);
             spawnTimer = 0;
         }
