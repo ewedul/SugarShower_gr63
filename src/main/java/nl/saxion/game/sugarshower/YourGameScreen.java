@@ -13,7 +13,7 @@ public class YourGameScreen extends ScalableGameScreen {
 
     //GAME SETTINGS
     public static final int BOWL_SIZE = 75;
-    public static final int BOWL_SPEED = 500;
+    public static final int BOWL_SPEED = 600;
     public static final int INGREDIENT_SIZE = 80;
 
     //GAME OBJECTS
@@ -140,7 +140,7 @@ public class YourGameScreen extends ScalableGameScreen {
             }
         }
 
-        drawHeartsLevel(lives);
+        drawLivesHearts(lives);
 
         GameApp.drawTexture("bowl", bowl.x, bowl.y, BOWL_SIZE, BOWL_SIZE);
         GameApp.drawText("roboto", "lives: " + lives, 30,getWorldHeight()-50,"black");
@@ -202,6 +202,18 @@ public class YourGameScreen extends ScalableGameScreen {
     private void spawnIngredients(float delta) {
         spawnTimer += delta;
 
+        //speed depending on phases level1-5 is phase 1, level 5-10 is phase 2, level 10-15 is phase 3
+        int ingredientSpeed = 200;
+
+        if (currentLevel>5){
+            ingredientSpeed+=100;
+        }
+        if (currentLevel>10){
+            ingredientSpeed+=100;
+        }
+
+
+
         if (spawnTimer >= spawnInterval) {
             String randomType;
 
@@ -220,7 +232,7 @@ public class YourGameScreen extends ScalableGameScreen {
                 randomType = ingredientTypes.get(SaxionApp.getRandomValueBetween(0, ingredientTypes.size()));
             }
 
-            Ingredient newIngredient = new Ingredient(randomType, 100 + random.nextInt(100));
+            Ingredient newIngredient = new Ingredient(randomType, ingredientSpeed + random.nextInt(100));
             newIngredient.x = random.nextInt((int)getWorldWidth() - INGREDIENT_SIZE);
             newIngredient.y = getWorldHeight();
             ingredients.add(newIngredient);
@@ -365,8 +377,8 @@ public class YourGameScreen extends ScalableGameScreen {
 
 
     }
-
-    public static void drawHeartsLevel(int lives){
+    //draw textures for the thee
+    public static void drawLivesHearts(int lives){
         float x= 600;
         for (int i=1; i<=lives; i++){
             GameApp.drawTexture("life", x,GameApp.getWorldHeight()-100, BOWL_SIZE, BOWL_SIZE);
@@ -375,6 +387,7 @@ public class YourGameScreen extends ScalableGameScreen {
 
         }
     }
+
 
 
 }
