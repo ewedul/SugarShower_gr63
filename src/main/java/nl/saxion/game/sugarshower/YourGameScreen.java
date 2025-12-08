@@ -1,5 +1,6 @@
 package nl.saxion.game.sugarshower;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Input;
 import nl.saxion.gameapp.GameApp;
 import nl.saxion.gameapp.screens.ScalableGameScreen;
@@ -11,7 +12,7 @@ import java.util.Random;
 public class YourGameScreen extends ScalableGameScreen {
 
     //GAME SETTINGS
-    public static final int BOWL_SIZE = 100;
+    public static final int BOWL_SIZE = 75;
     public static final int BOWL_SPEED = 500;
     public static final int INGREDIENT_SIZE = 80;
 
@@ -25,19 +26,24 @@ public class YourGameScreen extends ScalableGameScreen {
 
     //CSV DATA
 
-    ArrayList<Recipe> recipesArrayList = readCSVRecipes("src/main/resources/recipes.csv");
+    static ArrayList<Recipe> recipesArrayList = readCSVRecipes("src/main/resources/recipes.csv");
     ArrayList<String> ingredientTypes = readCSVIngredients("src/main/resources/ingredients.csv");
 
     // LEVEL SYSTEM
-    int currentLevel;
-    ArrayList<String> neededIngredients; // -- (We'll implement later, I got a bug -- Wina :))
+    static int currentLevel = 1;
+
+    ArrayList<String> neededIngredientsTemp;
+    static ArrayList<String> neededIngredients;
+
+    // -- (We'll implement later, I got a bug -- Wina :))
     // recipesArrayList.get(currentLevel).recipeIngredientList;
 
     ArrayList<String> caughtIngredients = new ArrayList<>();
     int countIngredientsCaught;
 
-    int lives = 3;
+    static int lives = 3;
     int score = 0;
+
 
     //POPUP -- Memorize Recipe
     boolean memorizeMode = true;
@@ -49,10 +55,14 @@ public class YourGameScreen extends ScalableGameScreen {
 
     @Override
     public void show() {
-        currentLevel = 1; // Keeps track of the level
+        //currentLevel = 1; // Keeps track of the level
 
-        neededIngredients = new ArrayList<>(
-                recipesArrayList.get(currentLevel - 1).recipeIngredientList);
+//        neededIngredients = new ArrayList<>(
+//                recipesArrayList.get(currentLevel - 1).recipeIngredientList);
+        setLevel(currentLevel);
+//        neededIngredientsTemp = new ArrayList<String>(recipesArrayList.get(currentLevel - 1).recipeIngredientList);
+//        neededIngredients = (ArrayList) neededIngredientsTemp.clone();
+
 
         //Pop-up setup.
         memorizeMode = true;
@@ -74,6 +84,7 @@ public class YourGameScreen extends ScalableGameScreen {
 
         // TEXTURES
         GameApp.addTexture("bowl", "textures/bowl_03.png");
+        GameApp.addTexture("life", "textures/life.png");
         GameApp.addTexture("background", "textures/pink-bg.png");
         GameApp.addFont("roboto", "fonts/Roboto_SemiBold.ttf", 20);
 
@@ -94,6 +105,7 @@ public class YourGameScreen extends ScalableGameScreen {
 
         handlePlayerInput(delta);
 
+
         if (!memorizeMode) {
             spawnIngredients(delta);
             updateIngredients(delta);
@@ -102,6 +114,11 @@ public class YourGameScreen extends ScalableGameScreen {
 
         // Escape button to exit
         if (GameApp.isKeyJustPressed(Input.Keys.ESCAPE)){
+            GameApp.switchScreen("GameOverScreen");
+            //Link to GameOver screen for now until we figure out the level system - Nhi
+        }
+
+        if (lives == 0){
             GameApp.switchScreen("GameOverScreen");
             //Link to GameOver screen for now until we figure out the level system - Nhi
         }
@@ -123,13 +140,15 @@ public class YourGameScreen extends ScalableGameScreen {
             }
         }
 
+        drawHeartsLevel(lives);
+
         GameApp.drawTexture("bowl", bowl.x, bowl.y, BOWL_SIZE, BOWL_SIZE);
-        GameApp.drawText("roboto", "score: " + countIngredientsCaught, 30,getWorldHeight()-50,"black");
+        GameApp.drawText("roboto", "lives: " + lives, 30,getWorldHeight()-50,"black");
 
         // print the current level and the level recipe
         GameApp.drawText("roboto", "Current level:" + recipesArrayList.get(currentLevel-1).level, 30,getWorldHeight()-100,"black");
         GameApp.drawText("roboto", "Recipe to make: " + recipesArrayList.get(currentLevel-1).name, 30,getWorldHeight()-150,"black");
-        //GameApp.drawText("roboto", "Ingredients needed to make: " + recipesArrayList.get(currentLevel-1).name + " " +  recipesArrayList.get(currentLevel-1).recipeIngredientList.toString() , 30,getWorldHeight()-200,"black");
+        GameApp.drawText("roboto", "Ingredients needed to make: " + recipesArrayList.get(currentLevel-1).name + " " + neededIngredients.toString() , 30,getWorldHeight()-200,"black");
 
         GameApp.endSpriteRendering();
 
@@ -169,7 +188,6 @@ public class YourGameScreen extends ScalableGameScreen {
     }
 
     public void handlePlayerInput(float delta) {
-
         if (GameApp.isKeyPressed(Input.Keys.LEFT)) {
             bowl.x = bowl.x - BOWL_SPEED * delta;
 
@@ -233,16 +251,26 @@ public class YourGameScreen extends ScalableGameScreen {
                 // Here you can add score or handle ingredient collection
                 System.out.println("Collected: " + ingredient.type);
 
+                //lose a life if wrong ingredient.
+                if (!neededIngredients.contains(ingredient.type)){
+                    System.out.println("wrong!!! -1 life");
+                    lives--;
+                }
+
                 // Check if caught ingredient is in the level's needed ingredient list
                 // removes the ingredient from the list if it matches
                 if (neededIngredients.contains(ingredient.type)){
                     neededIngredients.remove(ingredient.type);
                 }
+
+
                 // Once all the ingredients have been caught it raises the level and creates the next
                 // neededIngredients list
                 if (neededIngredients.isEmpty()){
                     currentLevel++;
-                    neededIngredients = new ArrayList<>(recipesArrayList.get(currentLevel - 1).recipeIngredientList);
+                    setLevel(currentLevel);
+//                    ArrayList<String> neededIngredientsTemp = new ArrayList<>(recipesArrayList.get(currentLevel - 1).recipeIngredientList);
+//                    neededIngredients = (ArrayList) neededIngredientsTemp.clone();
 
                     memorizeMode = true;
                     memorizeTime = 3f;
@@ -266,6 +294,7 @@ public class YourGameScreen extends ScalableGameScreen {
         GameApp.disposeTexture("bowl");
         GameApp.disposeTexture("background");
         GameApp.disposeTexture("roboto");
+        GameApp.disposeTexture("life");
 
 
         // Clean up ingredient textures
@@ -295,7 +324,7 @@ public class YourGameScreen extends ScalableGameScreen {
     }
 
     // Read the recipes.csv into an arraylist of Recipes
-    public ArrayList<Recipe> readCSVRecipes(String filename){
+    public static ArrayList<Recipe> readCSVRecipes(String filename){
         ArrayList<Recipe> recipes = new ArrayList<>();
         CsvReader reader = new CsvReader(filename);
         reader.skipRow();
@@ -321,6 +350,30 @@ public class YourGameScreen extends ScalableGameScreen {
             recipes.add(newRecipe);
         }
         return recipes;
+    }
+
+    public static int getCurrentLevel(){
+        return currentLevel;
+    }
+
+
+    public static void setLevel(int currentLevel){
+        ArrayList<String> neededIngredientsTemp = new ArrayList<>(recipesArrayList.get(currentLevel - 1).recipeIngredientList);
+        neededIngredients = (ArrayList) neededIngredientsTemp.clone();
+        lives = 3;
+        System.out.println("set: current level: "+ currentLevel);
+
+
+    }
+
+    public static void drawHeartsLevel(int lives){
+        float x= 600;
+        for (int i=1; i<=lives; i++){
+            GameApp.drawTexture("life", x,GameApp.getWorldHeight()-100, BOWL_SIZE, BOWL_SIZE);
+            x+=60;
+
+
+        }
     }
 
 
