@@ -1,0 +1,122 @@
+<html>
+<head>
+<title>GameOverScreen.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bcbec4;}
+.s3 { color: #2aacb8;}
+.s4 { color: #6aab73;}
+.s5 { color: #7a7e85;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+GameOverScreen.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">nl</span><span class="s2">.</span><span class="s1">saxion</span><span class="s2">.</span><span class="s1">game</span><span class="s2">.</span><span class="s1">sugarshower</span><span class="s2">;</span>
+
+
+<span class="s0">import </span><span class="s1">com</span><span class="s2">.</span><span class="s1">badlogic</span><span class="s2">.</span><span class="s1">gdx</span><span class="s2">.</span><span class="s1">Game</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">com</span><span class="s2">.</span><span class="s1">badlogic</span><span class="s2">.</span><span class="s1">gdx</span><span class="s2">.</span><span class="s1">Input</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">com</span><span class="s2">.</span><span class="s1">badlogic</span><span class="s2">.</span><span class="s1">gdx</span><span class="s2">.</span><span class="s1">audio</span><span class="s2">.</span><span class="s1">Music</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">com</span><span class="s2">.</span><span class="s1">badlogic</span><span class="s2">.</span><span class="s1">gdx</span><span class="s2">.</span><span class="s1">audio</span><span class="s2">.</span><span class="s1">Sound</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">com</span><span class="s2">.</span><span class="s1">badlogic</span><span class="s2">.</span><span class="s1">gdx</span><span class="s2">.</span><span class="s1">backends</span><span class="s2">.</span><span class="s1">lwjgl3</span><span class="s2">.</span><span class="s1">audio</span><span class="s2">.</span><span class="s1">Mp3</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">nl</span><span class="s2">.</span><span class="s1">saxion</span><span class="s2">.</span><span class="s1">gameapp</span><span class="s2">.</span><span class="s1">GameApp</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">nl</span><span class="s2">.</span><span class="s1">saxion</span><span class="s2">.</span><span class="s1">gameapp</span><span class="s2">.</span><span class="s1">gameobject</span><span class="s2">.</span><span class="s1">GameObject</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">nl</span><span class="s2">.</span><span class="s1">saxion</span><span class="s2">.</span><span class="s1">gameapp</span><span class="s2">.</span><span class="s1">screens</span><span class="s2">.</span><span class="s1">ScalableGameScreen</span><span class="s2">;</span>
+
+<span class="s0">public class </span><span class="s1">GameOverScreen </span><span class="s0">extends </span><span class="s1">ScalableGameScreen </span><span class="s2">{</span>
+    <span class="s0">float </span><span class="s1">worldWidth</span><span class="s2">;</span>
+    <span class="s0">float </span><span class="s1">worldHeight</span><span class="s2">;</span>
+
+    <span class="s0">int </span><span class="s1">selectedItem </span><span class="s2">= </span><span class="s3">0</span><span class="s2">;</span>
+
+    <span class="s0">public </span><span class="s1">GameOverScreen</span><span class="s2">() {</span>
+        <span class="s0">super</span><span class="s2">(</span><span class="s3">800</span><span class="s2">, </span><span class="s3">800</span><span class="s2">);</span>
+    <span class="s2">}</span>
+
+    <span class="s1">@Override</span>
+    <span class="s0">public void </span><span class="s1">show</span><span class="s2">() {</span>
+
+        <span class="s1">worldWidth </span><span class="s2">= </span><span class="s1">GameApp</span><span class="s2">.</span><span class="s1">getWorldWidth</span><span class="s2">();</span>
+        <span class="s1">worldHeight </span><span class="s2">= </span><span class="s1">GameApp</span><span class="s2">.</span><span class="s1">getWorldHeight</span><span class="s2">();</span>
+
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">addTexture</span><span class="s2">(</span><span class="s4">&quot;background&quot;</span><span class="s2">, </span><span class="s4">&quot;textures/pink-bg.png&quot;</span><span class="s2">);</span>
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">addFont</span><span class="s2">(</span><span class="s4">&quot;GameOver&quot;</span><span class="s2">, </span><span class="s4">&quot;fonts/basic.ttf&quot;</span><span class="s2">, </span><span class="s3">30</span><span class="s2">);</span>
+
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">addMusic</span><span class="s2">(</span><span class="s4">&quot;gameover-music&quot;</span><span class="s2">, </span><span class="s4">&quot;audio/gameover-music.mp3&quot;</span><span class="s2">);</span>
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">playMusic</span><span class="s2">(</span><span class="s4">&quot;gameover-music&quot;</span><span class="s2">,</span><span class="s0">true</span><span class="s2">,</span><span class="s3">0.2f</span><span class="s2">);</span>
+
+    <span class="s2">}</span>
+
+    <span class="s1">@Override</span>
+    <span class="s0">public void </span><span class="s1">render</span><span class="s2">(</span><span class="s0">float </span><span class="s1">delta</span><span class="s2">) {</span>
+        <span class="s0">super</span><span class="s2">.</span><span class="s1">render</span><span class="s2">(</span><span class="s1">delta</span><span class="s2">);</span>
+
+        <span class="s5">//Input logic</span>
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">GameApp</span><span class="s2">.</span><span class="s1">isKeyJustPressed</span><span class="s2">(</span><span class="s1">Input</span><span class="s2">.</span><span class="s1">Keys</span><span class="s2">.</span><span class="s1">DOWN</span><span class="s2">)) {</span>
+            <span class="s1">selectedItem </span><span class="s2">= (</span><span class="s1">selectedItem </span><span class="s2">+ </span><span class="s3">1</span><span class="s2">) % </span><span class="s3">2</span><span class="s2">;</span>
+        <span class="s2">} </span><span class="s0">else if </span><span class="s2">(</span><span class="s1">GameApp</span><span class="s2">.</span><span class="s1">isKeyJustPressed</span><span class="s2">(</span><span class="s1">Input</span><span class="s2">.</span><span class="s1">Keys</span><span class="s2">.</span><span class="s1">UP</span><span class="s2">)) {</span>
+            <span class="s1">selectedItem </span><span class="s2">-= </span><span class="s3">1</span><span class="s2">;</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">selectedItem </span><span class="s2">&lt; </span><span class="s3">0</span><span class="s2">) {</span>
+                <span class="s1">selectedItem </span><span class="s2">= </span><span class="s3">1</span><span class="s2">;</span>
+            <span class="s2">}</span>
+        <span class="s2">}</span>
+        <span class="s5">// retry the level</span>
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">GameApp</span><span class="s2">.</span><span class="s1">isKeyJustPressed</span><span class="s2">(</span><span class="s1">Input</span><span class="s2">.</span><span class="s1">Keys</span><span class="s2">.</span><span class="s1">ENTER</span><span class="s2">)) {</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">selectedItem </span><span class="s2">== </span><span class="s3">0</span><span class="s2">) {</span>
+
+                <span class="s1">YourGameScreen</span><span class="s2">.</span><span class="s1">setLevel</span><span class="s2">(</span><span class="s1">YourGameScreen</span><span class="s2">.</span><span class="s1">getCurrentLevel</span><span class="s2">());</span>
+                <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">switchScreen</span><span class="s2">(</span><span class="s4">&quot;YourGameScreen&quot;</span><span class="s2">);</span>
+
+
+            <span class="s2">} </span><span class="s0">else </span><span class="s2">{</span>
+                <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">quit</span><span class="s2">();</span>
+            <span class="s2">}</span>
+        <span class="s2">}</span>
+
+        <span class="s5">//Press M to turn on Mute Mode. Testing</span>
+        <span class="s5">//Further testing:Put all audio into ArrayList later, run for-loop, setVolume</span>
+        <span class="s0">if</span><span class="s2">(</span><span class="s1">GameApp</span><span class="s2">.</span><span class="s1">isKeyJustPressed</span><span class="s2">(</span><span class="s1">Input</span><span class="s2">.</span><span class="s1">Keys</span><span class="s2">.</span><span class="s1">M</span><span class="s2">)){</span>
+            <span class="s1">AudioControl</span><span class="s2">.</span><span class="s1">toggleMuteMode</span><span class="s2">();</span>
+            <span class="s1">Music bgMusic </span><span class="s2">= </span><span class="s1">GameApp</span><span class="s2">.</span><span class="s1">getMusic</span><span class="s2">(</span><span class="s4">&quot;gameover-music&quot;</span><span class="s2">);</span>
+            <span class="s1">bgMusic</span><span class="s2">.</span><span class="s1">setVolume</span><span class="s2">(</span><span class="s1">AudioControl</span><span class="s2">.</span><span class="s1">getVolume</span><span class="s2">(</span><span class="s3">0.2f</span><span class="s2">));</span>
+        <span class="s2">}</span>
+
+        <span class="s5">//Rendering</span>
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">clearScreen</span><span class="s2">();</span>
+
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">startSpriteRendering</span><span class="s2">();</span>
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">drawTexture</span><span class="s2">(</span><span class="s4">&quot;background&quot;</span><span class="s2">, </span><span class="s3">0</span><span class="s2">, </span><span class="s3">0</span><span class="s2">, </span><span class="s1">worldWidth</span><span class="s2">, </span><span class="s1">worldHeight</span><span class="s2">);</span>
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">drawTextHorizontallyCentered</span><span class="s2">(</span><span class="s4">&quot;GameOver&quot;</span><span class="s2">, </span><span class="s4">&quot;Looks like things got a little messy...&quot;</span><span class="s2">, </span><span class="s1">worldWidth </span><span class="s2">/ </span><span class="s3">2</span><span class="s2">, </span><span class="s1">worldHeight </span><span class="s2">/ </span><span class="s3">2 </span><span class="s2">+ </span><span class="s3">50</span><span class="s2">, </span><span class="s4">&quot;teal-900&quot;</span><span class="s2">);</span>
+
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">selectedItem </span><span class="s2">== </span><span class="s3">0</span><span class="s2">) {</span>
+            <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">drawTextHorizontallyCentered</span><span class="s2">(</span><span class="s4">&quot;GameOver&quot;</span><span class="s2">, </span><span class="s4">&quot;Retry the level&quot;</span><span class="s2">, </span><span class="s1">worldWidth </span><span class="s2">/ </span><span class="s3">2</span><span class="s2">, </span><span class="s1">worldHeight </span><span class="s2">/ </span><span class="s3">2</span><span class="s2">, </span><span class="s4">&quot;yellow-500&quot;</span><span class="s2">);</span>
+        <span class="s2">} </span><span class="s0">else </span><span class="s2">{</span>
+            <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">drawTextHorizontallyCentered</span><span class="s2">(</span><span class="s4">&quot;GameOver&quot;</span><span class="s2">, </span><span class="s4">&quot;Retry the level&quot;</span><span class="s2">, </span><span class="s1">worldWidth </span><span class="s2">/ </span><span class="s3">2</span><span class="s2">, </span><span class="s1">worldHeight </span><span class="s2">/ </span><span class="s3">2</span><span class="s2">, </span><span class="s4">&quot;teal-900&quot;</span><span class="s2">);</span>
+        <span class="s2">}</span>
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">selectedItem </span><span class="s2">== </span><span class="s3">1</span><span class="s2">) {</span>
+            <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">drawTextHorizontallyCentered</span><span class="s2">(</span><span class="s4">&quot;GameOver&quot;</span><span class="s2">, </span><span class="s4">&quot;Quit&quot;</span><span class="s2">, </span><span class="s1">worldWidth </span><span class="s2">/ </span><span class="s3">2</span><span class="s2">, </span><span class="s1">worldHeight </span><span class="s2">/ </span><span class="s3">2 </span><span class="s2">- </span><span class="s3">50</span><span class="s2">, </span><span class="s4">&quot;yellow-500&quot;</span><span class="s2">);</span>
+        <span class="s2">} </span><span class="s0">else </span><span class="s2">{</span>
+            <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">drawTextHorizontallyCentered</span><span class="s2">(</span><span class="s4">&quot;GameOver&quot;</span><span class="s2">, </span><span class="s4">&quot;Quit&quot;</span><span class="s2">, </span><span class="s1">worldWidth </span><span class="s2">/ </span><span class="s3">2</span><span class="s2">, </span><span class="s1">worldHeight </span><span class="s2">/ </span><span class="s3">2 </span><span class="s2">- </span><span class="s3">50</span><span class="s2">, </span><span class="s4">&quot;teal-900&quot;</span><span class="s2">);</span>
+        <span class="s2">}</span>
+
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">endSpriteRendering</span><span class="s2">();</span>
+    <span class="s2">}</span>
+
+    <span class="s1">@Override</span>
+    <span class="s0">public void </span><span class="s1">hide</span><span class="s2">() {</span>
+
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">stopMusic</span><span class="s2">(</span><span class="s4">&quot;gameover-music&quot;</span><span class="s2">);</span>
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">disposeTexture</span><span class="s2">(</span><span class="s4">&quot;background&quot;</span><span class="s2">);</span>
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">disposeFont</span><span class="s2">(</span><span class="s4">&quot;GameOver&quot;</span><span class="s2">);</span>
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">disposeMusic</span><span class="s2">(</span><span class="s4">&quot;gameover-music&quot;</span><span class="s2">);</span>
+    <span class="s2">}</span>
+<span class="s2">}</span>
+</pre>
+</body>
+</html>
