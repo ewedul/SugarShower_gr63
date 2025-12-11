@@ -1,0 +1,51 @@
+<html>
+<head>
+<title>AudioControl.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bcbec4;}
+.s3 { color: #2aacb8;}
+.s4 { color: #7a7e85;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+AudioControl.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">nl</span><span class="s2">.</span><span class="s1">saxion</span><span class="s2">.</span><span class="s1">game</span><span class="s2">.</span><span class="s1">sugarshower</span><span class="s2">;</span>
+
+<span class="s0">import </span><span class="s1">nl</span><span class="s2">.</span><span class="s1">saxion</span><span class="s2">.</span><span class="s1">gameapp</span><span class="s2">.</span><span class="s1">GameApp</span><span class="s2">;</span>
+
+<span class="s0">public class </span><span class="s1">AudioControl </span><span class="s2">{</span>
+    <span class="s0">public static boolean </span><span class="s1">muteMode</span><span class="s2">;</span>
+
+
+    <span class="s0">public static void </span><span class="s1">toggleMuteMode</span><span class="s2">() {</span>
+        <span class="s1">muteMode </span><span class="s2">= !</span><span class="s1">muteMode</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public static float </span><span class="s1">getVolume</span><span class="s2">(</span><span class="s0">float </span><span class="s1">volume</span><span class="s2">) {</span>
+        <span class="s0">return </span><span class="s1">muteMode </span><span class="s2">? </span><span class="s3">0f </span><span class="s2">: </span><span class="s1">volume</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+
+<span class="s4">//   Testing feature</span>
+<span class="s4">//    public static void playMusic(String audioName, boolean flag, float volume) {</span>
+<span class="s4">//        GameApp.playMusic(audioName, flag, AudioControl.getVolume(volume));</span>
+<span class="s4">//    }</span>
+<span class="s4">//    public static void playSound(String audioName, float number){</span>
+<span class="s4">//        if(!AudioControl.muteMode) {</span>
+<span class="s4">//            GameApp.playSound(audioName, number);</span>
+<span class="s4">//        }else{</span>
+<span class="s4">//            GameApp.playSound(audioName,0f);</span>
+<span class="s4">//        }</span>
+<span class="s4">//    }</span>
+
+<span class="s2">}</span>
+</pre>
+</body>
+</html>
