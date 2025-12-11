@@ -96,7 +96,7 @@ public class YourGameScreen extends ScalableGameScreen {
         }
 
         for (Recipe recipe : recipesArrayList) {
-            String texturePath = "textures/" + recipe.name  + ".png";
+            String texturePath = "textures/finished_products/" + recipe.name  + ".png";
             GameApp.addTexture(recipe.name, texturePath);
         }
 
@@ -438,7 +438,6 @@ public class YourGameScreen extends ScalableGameScreen {
 
     public static void drawRecipes(int currentLevel){
         GameApp.drawTexture(recipesArrayList.get(currentLevel-1).name,620, 630, INGREDIENT_SIZE, INGREDIENT_SIZE);
-        //System.out.println("current level for drawing recipe img: "+ recipesArrayList.get(currentLevel-1).name + " " + currentLevel);
 
     }
 
