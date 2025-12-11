@@ -1,5 +1,6 @@
 package nl.saxion.game.sugarshower;
 
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
@@ -46,9 +47,14 @@ public class GameOverScreen extends ScalableGameScreen {
                 selectedItem = 1;
             }
         }
+        // retry the level
         if (GameApp.isKeyJustPressed(Input.Keys.ENTER)) {
             if (selectedItem == 0) {
-                GameApp.switchScreen("MainMenuScreen");
+
+                YourGameScreen.setLevel(YourGameScreen.getCurrentLevel());
+                GameApp.switchScreen("YourGameScreen");
+
+
             } else {
                 GameApp.quit();
             }

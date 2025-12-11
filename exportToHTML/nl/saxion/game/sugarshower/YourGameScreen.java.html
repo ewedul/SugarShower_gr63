@@ -1,0 +1,415 @@
+<html>
+<head>
+<title>YourGameScreen.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bcbec4;}
+.s3 { color: #7a7e85;}
+.s4 { color: #2aacb8;}
+.s5 { color: #6aab73;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+YourGameScreen.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">nl</span><span class="s2">.</span><span class="s1">saxion</span><span class="s2">.</span><span class="s1">game</span><span class="s2">.</span><span class="s1">sugarshower</span><span class="s2">;</span>
+
+<span class="s0">import </span><span class="s1">com</span><span class="s2">.</span><span class="s1">badlogic</span><span class="s2">.</span><span class="s1">gdx</span><span class="s2">.</span><span class="s1">Game</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">com</span><span class="s2">.</span><span class="s1">badlogic</span><span class="s2">.</span><span class="s1">gdx</span><span class="s2">.</span><span class="s1">Input</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">nl</span><span class="s2">.</span><span class="s1">saxion</span><span class="s2">.</span><span class="s1">gameapp</span><span class="s2">.</span><span class="s1">GameApp</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">nl</span><span class="s2">.</span><span class="s1">saxion</span><span class="s2">.</span><span class="s1">gameapp</span><span class="s2">.</span><span class="s1">screens</span><span class="s2">.</span><span class="s1">ScalableGameScreen</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">nl</span><span class="s2">.</span><span class="s1">saxion</span><span class="s2">.</span><span class="s1">app</span><span class="s2">.</span><span class="s1">CsvReader</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">nl</span><span class="s2">.</span><span class="s1">saxion</span><span class="s2">.</span><span class="s1">app</span><span class="s2">.</span><span class="s1">SaxionApp</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">util</span><span class="s2">.</span><span class="s1">ArrayList</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">util</span><span class="s2">.</span><span class="s1">Random</span><span class="s2">;</span>
+
+<span class="s0">public class </span><span class="s1">YourGameScreen </span><span class="s0">extends </span><span class="s1">ScalableGameScreen </span><span class="s2">{</span>
+
+    <span class="s3">//GAME SETTINGS</span>
+    <span class="s0">public static final int </span><span class="s1">BOWL_SIZE </span><span class="s2">= </span><span class="s4">75</span><span class="s2">;</span>
+    <span class="s0">public static final int </span><span class="s1">BOWL_SPEED </span><span class="s2">= </span><span class="s4">600</span><span class="s2">;</span>
+    <span class="s0">public static final int </span><span class="s1">INGREDIENT_SIZE </span><span class="s2">= </span><span class="s4">80</span><span class="s2">;</span>
+
+    <span class="s3">//GAME OBJECTS</span>
+    <span class="s1">Bowl bowl</span><span class="s2">;</span>
+    <span class="s1">ArrayList</span><span class="s2">&lt;</span><span class="s1">Ingredient</span><span class="s2">&gt; </span><span class="s1">ingredients</span><span class="s2">;</span>
+    <span class="s1">Random random</span><span class="s2">;</span>
+
+    <span class="s0">float </span><span class="s1">spawnTimer</span><span class="s2">;</span>
+    <span class="s0">float </span><span class="s1">spawnInterval </span><span class="s2">= </span><span class="s4">1.0f</span><span class="s2">; </span><span class="s3">// -- Spawn every 1 second</span>
+
+    <span class="s3">//CSV DATA</span>
+
+    <span class="s0">static </span><span class="s1">ArrayList</span><span class="s2">&lt;</span><span class="s1">Recipe</span><span class="s2">&gt; </span><span class="s1">recipesArrayList </span><span class="s2">= </span><span class="s1">readCSVRecipes</span><span class="s2">(</span><span class="s5">&quot;src/main/resources/recipes.csv&quot;</span><span class="s2">);</span>
+    <span class="s1">ArrayList</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">&gt; </span><span class="s1">ingredientTypes </span><span class="s2">= </span><span class="s1">readCSVIngredients</span><span class="s2">(</span><span class="s5">&quot;src/main/resources/ingredients.csv&quot;</span><span class="s2">);</span>
+
+    <span class="s3">// LEVEL SYSTEM</span>
+    <span class="s0">static int </span><span class="s1">currentLevel </span><span class="s2">= </span><span class="s4">1</span><span class="s2">;</span>
+
+    <span class="s1">ArrayList</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">&gt; </span><span class="s1">neededIngredientsTemp</span><span class="s2">;</span>
+    <span class="s0">static </span><span class="s1">ArrayList</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">&gt; </span><span class="s1">neededIngredients</span><span class="s2">;</span>
+
+    <span class="s3">// -- (We'll implement later, I got a bug -- Wina :))</span>
+    <span class="s3">// recipesArrayList.get(currentLevel).recipeIngredientList;</span>
+
+    <span class="s1">ArrayList</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">&gt; </span><span class="s1">caughtIngredients </span><span class="s2">= </span><span class="s0">new </span><span class="s1">ArrayList</span><span class="s2">&lt;&gt;();</span>
+    <span class="s0">int </span><span class="s1">countIngredientsCaught</span><span class="s2">;</span>
+
+    <span class="s0">static int </span><span class="s1">lives </span><span class="s2">= </span><span class="s4">3</span><span class="s2">;</span>
+    <span class="s0">int </span><span class="s1">score </span><span class="s2">= </span><span class="s4">0</span><span class="s2">;</span>
+
+
+    <span class="s3">//POPUP -- Memorize Recipe</span>
+    <span class="s0">boolean </span><span class="s1">memorizeMode </span><span class="s2">= </span><span class="s0">true</span><span class="s2">;</span>
+    <span class="s0">float </span><span class="s1">memorizeTime </span><span class="s2">= </span><span class="s4">3f</span><span class="s2">;</span>
+
+    <span class="s0">public </span><span class="s1">YourGameScreen</span><span class="s2">() {</span>
+        <span class="s0">super</span><span class="s2">(</span><span class="s4">800</span><span class="s2">, </span><span class="s4">800</span><span class="s2">);</span>
+    <span class="s2">}</span>
+
+    <span class="s1">@Override</span>
+    <span class="s0">public void </span><span class="s1">show</span><span class="s2">() {</span>
+        <span class="s3">//currentLevel = 1; // Keeps track of the level</span>
+
+<span class="s3">//        neededIngredients = new ArrayList&lt;&gt;(</span>
+<span class="s3">//                recipesArrayList.get(currentLevel - 1).recipeIngredientList);</span>
+        <span class="s1">setLevel</span><span class="s2">(</span><span class="s1">currentLevel</span><span class="s2">);</span>
+<span class="s3">//        neededIngredientsTemp = new ArrayList&lt;String&gt;(recipesArrayList.get(currentLevel - 1).recipeIngredientList);</span>
+<span class="s3">//        neededIngredients = (ArrayList) neededIngredientsTemp.clone();</span>
+
+
+        <span class="s3">//Pop-up setup.</span>
+        <span class="s1">memorizeMode </span><span class="s2">= </span><span class="s0">true</span><span class="s2">;</span>
+        <span class="s1">memorizeTime </span><span class="s2">= </span><span class="s4">3f</span><span class="s2">;</span>
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">addTexture</span><span class="s2">(</span><span class="s5">&quot;popup_gui&quot;</span><span class="s2">, </span><span class="s5">&quot;textures/recipe_popup.png&quot;</span><span class="s2">);</span>
+
+        <span class="s3">//BOWL</span>
+        <span class="s1">bowl </span><span class="s2">= </span><span class="s0">new </span><span class="s1">Bowl</span><span class="s2">();</span>
+        <span class="s1">bowl</span><span class="s2">.</span><span class="s1">x </span><span class="s2">= </span><span class="s1">getWorldWidth</span><span class="s2">() / </span><span class="s4">2 </span><span class="s2">- (</span><span class="s0">float</span><span class="s2">) </span><span class="s1">BOWL_SIZE </span><span class="s2">/ </span><span class="s4">2</span><span class="s2">;</span>
+        <span class="s1">bowl</span><span class="s2">.</span><span class="s1">y </span><span class="s2">= </span><span class="s4">50</span><span class="s2">; </span><span class="s3">// Position bowl at the bottom</span>
+
+        <span class="s3">//INGREDIENT SYSTEM</span>
+        <span class="s1">ingredients </span><span class="s2">= </span><span class="s0">new </span><span class="s1">ArrayList</span><span class="s2">&lt;&gt;();</span>
+        <span class="s1">random </span><span class="s2">= </span><span class="s0">new </span><span class="s1">Random</span><span class="s2">();</span>
+        <span class="s1">spawnTimer </span><span class="s2">= </span><span class="s4">0</span><span class="s2">;</span>
+        <span class="s1">countIngredientsCaught </span><span class="s2">= </span><span class="s4">0</span><span class="s2">;</span>
+
+        <span class="s3">//ArrayList&lt;Recipe&gt; recipesArrayList = readCSVRecipes(&quot;src/main/resources/recipes.csv&quot;);</span>
+
+        <span class="s3">// TEXTURES</span>
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">addTexture</span><span class="s2">(</span><span class="s5">&quot;bowl&quot;</span><span class="s2">, </span><span class="s5">&quot;textures/bowl_03.png&quot;</span><span class="s2">);</span>
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">addTexture</span><span class="s2">(</span><span class="s5">&quot;life&quot;</span><span class="s2">, </span><span class="s5">&quot;textures/life.png&quot;</span><span class="s2">);</span>
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">addTexture</span><span class="s2">(</span><span class="s5">&quot;background&quot;</span><span class="s2">, </span><span class="s5">&quot;textures/pink-bg.png&quot;</span><span class="s2">);</span>
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">addFont</span><span class="s2">(</span><span class="s5">&quot;roboto&quot;</span><span class="s2">, </span><span class="s5">&quot;fonts/Roboto_SemiBold.ttf&quot;</span><span class="s2">, </span><span class="s4">20</span><span class="s2">);</span>
+
+        <span class="s3">// Load all ingredient images using helper method</span>
+        <span class="s0">for </span><span class="s2">(</span><span class="s1">String ingredientName </span><span class="s2">: </span><span class="s1">ingredientTypes</span><span class="s2">) {</span>
+            <span class="s1">String texturePath </span><span class="s2">= </span><span class="s1">getTexturePath</span><span class="s2">(</span><span class="s1">ingredientName</span><span class="s2">);</span>
+            <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">addTexture</span><span class="s2">(</span><span class="s1">ingredientName</span><span class="s2">, </span><span class="s1">texturePath</span><span class="s2">);</span>
+        <span class="s2">}</span>
+
+
+    <span class="s2">}</span>
+
+    <span class="s1">@Override</span>
+    <span class="s0">public void </span><span class="s1">render</span><span class="s2">(</span><span class="s0">float </span><span class="s1">delta</span><span class="s2">) {</span>
+        <span class="s0">super</span><span class="s2">.</span><span class="s1">render</span><span class="s2">(</span><span class="s1">delta</span><span class="s2">);</span>
+
+        <span class="s1">popUpRecipeTimer</span><span class="s2">(</span><span class="s1">delta</span><span class="s2">);</span>
+
+        <span class="s1">handlePlayerInput</span><span class="s2">(</span><span class="s1">delta</span><span class="s2">);</span>
+
+
+        <span class="s0">if </span><span class="s2">(!</span><span class="s1">memorizeMode</span><span class="s2">) {</span>
+            <span class="s1">spawnIngredients</span><span class="s2">(</span><span class="s1">delta</span><span class="s2">);</span>
+            <span class="s1">updateIngredients</span><span class="s2">(</span><span class="s1">delta</span><span class="s2">);</span>
+            <span class="s1">checkCollisions</span><span class="s2">();</span>
+        <span class="s2">}</span>
+
+        <span class="s3">// Escape button to exit</span>
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">GameApp</span><span class="s2">.</span><span class="s1">isKeyJustPressed</span><span class="s2">(</span><span class="s1">Input</span><span class="s2">.</span><span class="s1">Keys</span><span class="s2">.</span><span class="s1">ESCAPE</span><span class="s2">)){</span>
+            <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">switchScreen</span><span class="s2">(</span><span class="s5">&quot;GameOverScreen&quot;</span><span class="s2">);</span>
+            <span class="s3">//Link to GameOver screen for now until we figure out the level system - Nhi</span>
+        <span class="s2">}</span>
+
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">lives </span><span class="s2">== </span><span class="s4">0</span><span class="s2">){</span>
+            <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">switchScreen</span><span class="s2">(</span><span class="s5">&quot;GameOverScreen&quot;</span><span class="s2">);</span>
+            <span class="s3">//Link to GameOver screen for now until we figure out the level system - Nhi</span>
+        <span class="s2">}</span>
+
+        <span class="s3">// Draw elements</span>
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">clearScreen</span><span class="s2">();</span>
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">startSpriteRendering</span><span class="s2">();</span>
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">drawTexture</span><span class="s2">(</span><span class="s5">&quot;background&quot;</span><span class="s2">, </span><span class="s4">0</span><span class="s2">, </span><span class="s4">0</span><span class="s2">, </span><span class="s1">getWorldWidth</span><span class="s2">(), </span><span class="s1">getWorldHeight</span><span class="s2">());</span>
+
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">memorizeMode</span><span class="s2">) {</span>
+            <span class="s1">drawRecipePopup</span><span class="s2">();</span>
+            <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">endSpriteRendering</span><span class="s2">();</span>
+            <span class="s0">return</span><span class="s2">;</span>
+        <span class="s2">}</span>
+
+        <span class="s0">for </span><span class="s2">(</span><span class="s1">Ingredient ingredient </span><span class="s2">: </span><span class="s1">ingredients</span><span class="s2">) {</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">ingredient</span><span class="s2">.</span><span class="s1">active</span><span class="s2">) {</span>
+                <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">drawTexture</span><span class="s2">(</span><span class="s1">ingredient</span><span class="s2">.</span><span class="s1">type</span><span class="s2">, </span><span class="s1">ingredient</span><span class="s2">.</span><span class="s1">x</span><span class="s2">, </span><span class="s1">ingredient</span><span class="s2">.</span><span class="s1">y</span><span class="s2">, </span><span class="s1">INGREDIENT_SIZE</span><span class="s2">, </span><span class="s1">INGREDIENT_SIZE</span><span class="s2">);</span>
+            <span class="s2">}</span>
+        <span class="s2">}</span>
+
+        <span class="s1">drawLivesHearts</span><span class="s2">(</span><span class="s1">lives</span><span class="s2">);</span>
+
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">drawTexture</span><span class="s2">(</span><span class="s5">&quot;bowl&quot;</span><span class="s2">, </span><span class="s1">bowl</span><span class="s2">.</span><span class="s1">x</span><span class="s2">, </span><span class="s1">bowl</span><span class="s2">.</span><span class="s1">y</span><span class="s2">, </span><span class="s1">BOWL_SIZE</span><span class="s2">, </span><span class="s1">BOWL_SIZE</span><span class="s2">);</span>
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">drawText</span><span class="s2">(</span><span class="s5">&quot;roboto&quot;</span><span class="s2">, </span><span class="s5">&quot;lives: &quot; </span><span class="s2">+ </span><span class="s1">lives</span><span class="s2">, </span><span class="s4">30</span><span class="s2">,</span><span class="s1">getWorldHeight</span><span class="s2">()-</span><span class="s4">50</span><span class="s2">,</span><span class="s5">&quot;black&quot;</span><span class="s2">);</span>
+
+        <span class="s3">// print the current level and the level recipe</span>
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">drawText</span><span class="s2">(</span><span class="s5">&quot;roboto&quot;</span><span class="s2">, </span><span class="s5">&quot;Current level:&quot; </span><span class="s2">+ </span><span class="s1">recipesArrayList</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s1">currentLevel</span><span class="s2">-</span><span class="s4">1</span><span class="s2">).</span><span class="s1">level</span><span class="s2">, </span><span class="s4">30</span><span class="s2">,</span><span class="s1">getWorldHeight</span><span class="s2">()-</span><span class="s4">100</span><span class="s2">,</span><span class="s5">&quot;black&quot;</span><span class="s2">);</span>
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">drawText</span><span class="s2">(</span><span class="s5">&quot;roboto&quot;</span><span class="s2">, </span><span class="s5">&quot;Recipe to make: &quot; </span><span class="s2">+ </span><span class="s1">recipesArrayList</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s1">currentLevel</span><span class="s2">-</span><span class="s4">1</span><span class="s2">).</span><span class="s1">name</span><span class="s2">, </span><span class="s4">30</span><span class="s2">,</span><span class="s1">getWorldHeight</span><span class="s2">()-</span><span class="s4">150</span><span class="s2">,</span><span class="s5">&quot;black&quot;</span><span class="s2">);</span>
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">drawText</span><span class="s2">(</span><span class="s5">&quot;roboto&quot;</span><span class="s2">, </span><span class="s5">&quot;Ingredients needed to make: &quot; </span><span class="s2">+ </span><span class="s1">recipesArrayList</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s1">currentLevel</span><span class="s2">-</span><span class="s4">1</span><span class="s2">).</span><span class="s1">name </span><span class="s2">+ </span><span class="s5">&quot; &quot; </span><span class="s2">+ </span><span class="s1">neededIngredients</span><span class="s2">.</span><span class="s1">toString</span><span class="s2">() , </span><span class="s4">30</span><span class="s2">,</span><span class="s1">getWorldHeight</span><span class="s2">()-</span><span class="s4">200</span><span class="s2">,</span><span class="s5">&quot;black&quot;</span><span class="s2">);</span>
+
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">endSpriteRendering</span><span class="s2">();</span>
+
+    <span class="s2">}</span>
+
+    <span class="s0">private void </span><span class="s1">drawRecipePopup</span><span class="s2">() {</span>
+        <span class="s0">float </span><span class="s1">popupW </span><span class="s2">= </span><span class="s4">600</span><span class="s2">;</span>
+        <span class="s0">float </span><span class="s1">popupH </span><span class="s2">= </span><span class="s4">400</span><span class="s2">;</span>
+        <span class="s0">float </span><span class="s1">popupX </span><span class="s2">= </span><span class="s1">getWorldWidth</span><span class="s2">() / </span><span class="s4">2 </span><span class="s2">- </span><span class="s1">popupW </span><span class="s2">/ </span><span class="s4">2</span><span class="s2">;</span>
+        <span class="s0">float </span><span class="s1">popupY </span><span class="s2">= </span><span class="s1">getWorldHeight</span><span class="s2">() / </span><span class="s4">2 </span><span class="s2">- </span><span class="s1">popupH </span><span class="s2">/ </span><span class="s4">2</span><span class="s2">;</span>
+
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">drawTexture</span><span class="s2">(</span><span class="s5">&quot;popup_gui&quot;</span><span class="s2">, </span><span class="s1">popupX</span><span class="s2">, </span><span class="s1">popupY</span><span class="s2">, </span><span class="s1">popupW</span><span class="s2">, </span><span class="s1">popupH</span><span class="s2">);</span>
+
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">drawTextHorizontallyCentered</span><span class="s2">(</span><span class="s5">&quot;roboto&quot;</span><span class="s2">, </span><span class="s5">&quot;MEMORIZE THIS RECIPE!&quot;</span><span class="s2">,</span>
+                <span class="s1">getWorldWidth</span><span class="s2">() / </span><span class="s4">2</span><span class="s2">, </span><span class="s1">popupY </span><span class="s2">+ </span><span class="s1">popupH </span><span class="s2">- </span><span class="s4">40</span><span class="s2">, </span><span class="s5">&quot;black&quot;</span><span class="s2">);</span>
+
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">drawTextHorizontallyCentered</span><span class="s2">(</span><span class="s5">&quot;roboto&quot;</span><span class="s2">,</span>
+                <span class="s1">recipesArrayList</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s1">currentLevel </span><span class="s2">- </span><span class="s4">1</span><span class="s2">).</span><span class="s1">name</span><span class="s2">,</span>
+                <span class="s1">getWorldWidth</span><span class="s2">() / </span><span class="s4">2</span><span class="s2">, </span><span class="s1">popupY </span><span class="s2">+ </span><span class="s1">popupH </span><span class="s2">- </span><span class="s4">90</span><span class="s2">, </span><span class="s5">&quot;black&quot;</span><span class="s2">);</span>
+
+        <span class="s0">float </span><span class="s1">textX </span><span class="s2">= </span><span class="s1">popupX </span><span class="s2">+ </span><span class="s4">40</span><span class="s2">;</span>
+        <span class="s0">float </span><span class="s1">textY </span><span class="s2">= </span><span class="s1">popupY </span><span class="s2">+ </span><span class="s1">popupH </span><span class="s2">- </span><span class="s4">140</span><span class="s2">;</span>
+
+        <span class="s0">for </span><span class="s2">(</span><span class="s1">String ing </span><span class="s2">: </span><span class="s1">neededIngredients</span><span class="s2">) {</span>
+            <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">drawText</span><span class="s2">(</span><span class="s5">&quot;roboto&quot;</span><span class="s2">, </span><span class="s5">&quot;- &quot; </span><span class="s2">+ </span><span class="s1">ing</span><span class="s2">, </span><span class="s1">textX</span><span class="s2">+</span><span class="s4">150</span><span class="s2">, </span><span class="s1">textY</span><span class="s2">, </span><span class="s5">&quot;black&quot;</span><span class="s2">);</span>
+            <span class="s1">textY </span><span class="s2">-= </span><span class="s4">30</span><span class="s2">;</span>
+        <span class="s2">}</span>
+    <span class="s2">}</span>
+
+    <span class="s0">private void </span><span class="s1">popUpRecipeTimer</span><span class="s2">(</span><span class="s0">float </span><span class="s1">delta</span><span class="s2">) {</span>
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">memorizeMode</span><span class="s2">) {</span>
+            <span class="s1">memorizeTime </span><span class="s2">-= </span><span class="s1">delta</span><span class="s2">;</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">memorizeTime </span><span class="s2">&lt;= </span><span class="s4">0</span><span class="s2">) {</span>
+                <span class="s1">memorizeMode </span><span class="s2">= </span><span class="s0">false</span><span class="s2">;</span>
+            <span class="s2">}</span>
+        <span class="s2">}</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public void </span><span class="s1">handlePlayerInput</span><span class="s2">(</span><span class="s0">float </span><span class="s1">delta</span><span class="s2">) {</span>
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">GameApp</span><span class="s2">.</span><span class="s1">isKeyPressed</span><span class="s2">(</span><span class="s1">Input</span><span class="s2">.</span><span class="s1">Keys</span><span class="s2">.</span><span class="s1">LEFT</span><span class="s2">)) {</span>
+            <span class="s1">bowl</span><span class="s2">.</span><span class="s1">x </span><span class="s2">= </span><span class="s1">bowl</span><span class="s2">.</span><span class="s1">x </span><span class="s2">- </span><span class="s1">BOWL_SPEED </span><span class="s2">* </span><span class="s1">delta</span><span class="s2">;</span>
+
+        <span class="s2">} </span><span class="s0">else if </span><span class="s2">(</span><span class="s1">GameApp</span><span class="s2">.</span><span class="s1">isKeyPressed</span><span class="s2">(</span><span class="s1">Input</span><span class="s2">.</span><span class="s1">Keys</span><span class="s2">.</span><span class="s1">RIGHT</span><span class="s2">)) {</span>
+            <span class="s1">bowl</span><span class="s2">.</span><span class="s1">x </span><span class="s2">= </span><span class="s1">bowl</span><span class="s2">.</span><span class="s1">x </span><span class="s2">+ </span><span class="s1">BOWL_SPEED </span><span class="s2">* </span><span class="s1">delta</span><span class="s2">;</span>
+        <span class="s2">}</span>
+
+        <span class="s1">bowl</span><span class="s2">.</span><span class="s1">y </span><span class="s2">= </span><span class="s1">GameApp</span><span class="s2">.</span><span class="s1">clamp</span><span class="s2">(</span><span class="s1">bowl</span><span class="s2">.</span><span class="s1">y</span><span class="s2">, </span><span class="s4">0</span><span class="s2">, </span><span class="s1">getWorldHeight</span><span class="s2">() - </span><span class="s1">BOWL_SIZE</span><span class="s2">);</span>
+        <span class="s1">bowl</span><span class="s2">.</span><span class="s1">x </span><span class="s2">= </span><span class="s1">GameApp</span><span class="s2">.</span><span class="s1">clamp</span><span class="s2">(</span><span class="s1">bowl</span><span class="s2">.</span><span class="s1">x</span><span class="s2">, </span><span class="s4">0</span><span class="s2">, </span><span class="s1">getWorldWidth</span><span class="s2">() - </span><span class="s1">BOWL_SIZE</span><span class="s2">);</span>
+    <span class="s2">}</span>
+
+    <span class="s0">private void </span><span class="s1">spawnIngredients</span><span class="s2">(</span><span class="s0">float </span><span class="s1">delta</span><span class="s2">) {</span>
+        <span class="s1">spawnTimer </span><span class="s2">+= </span><span class="s1">delta</span><span class="s2">;</span>
+
+        <span class="s3">//speed depending on phases level1-5 is phase 1, level 5-10 is phase 2, level 10-15 is phase 3</span>
+        <span class="s0">int </span><span class="s1">ingredientSpeed </span><span class="s2">= </span><span class="s4">200</span><span class="s2">;</span>
+
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">currentLevel</span><span class="s2">&gt;</span><span class="s4">5</span><span class="s2">){</span>
+            <span class="s1">ingredientSpeed</span><span class="s2">+=</span><span class="s4">100</span><span class="s2">;</span>
+        <span class="s2">}</span>
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">currentLevel</span><span class="s2">&gt;</span><span class="s4">10</span><span class="s2">){</span>
+            <span class="s1">ingredientSpeed</span><span class="s2">+=</span><span class="s4">100</span><span class="s2">;</span>
+        <span class="s2">}</span>
+
+
+
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">spawnTimer </span><span class="s2">&gt;= </span><span class="s1">spawnInterval</span><span class="s2">) {</span>
+            <span class="s1">String randomType</span><span class="s2">;</span>
+
+            <span class="s3">// 60% chance to spawn needed ingredient, 40% chance random</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">random</span><span class="s2">.</span><span class="s1">nextFloat</span><span class="s2">() &lt; </span><span class="s4">0.6f </span><span class="s2">&amp;&amp; !</span><span class="s1">neededIngredients</span><span class="s2">.</span><span class="s1">isEmpty</span><span class="s2">()) {</span>
+                <span class="s3">// Spawn a needed ingredient (that hasn't been caught yet)</span>
+                <span class="s1">ArrayList</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">&gt; </span><span class="s1">stillNeeded </span><span class="s2">= </span><span class="s0">new </span><span class="s1">ArrayList</span><span class="s2">&lt;&gt;(</span><span class="s1">neededIngredients</span><span class="s2">);</span>
+
+                <span class="s0">if </span><span class="s2">(!</span><span class="s1">stillNeeded</span><span class="s2">.</span><span class="s1">isEmpty</span><span class="s2">()) {</span>
+                    <span class="s1">randomType </span><span class="s2">= </span><span class="s1">stillNeeded</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s1">random</span><span class="s2">.</span><span class="s1">nextInt</span><span class="s2">(</span><span class="s1">stillNeeded</span><span class="s2">.</span><span class="s1">size</span><span class="s2">()));</span>
+                <span class="s2">} </span><span class="s0">else </span><span class="s2">{</span>
+                    <span class="s1">randomType </span><span class="s2">= </span><span class="s1">ingredientTypes</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s1">SaxionApp</span><span class="s2">.</span><span class="s1">getRandomValueBetween</span><span class="s2">(</span><span class="s4">0</span><span class="s2">, </span><span class="s1">ingredientTypes</span><span class="s2">.</span><span class="s1">size</span><span class="s2">()));</span>
+                <span class="s2">}</span>
+            <span class="s2">} </span><span class="s0">else </span><span class="s2">{</span>
+                <span class="s3">// Spawn any random ingredient</span>
+                <span class="s1">randomType </span><span class="s2">= </span><span class="s1">ingredientTypes</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s1">SaxionApp</span><span class="s2">.</span><span class="s1">getRandomValueBetween</span><span class="s2">(</span><span class="s4">0</span><span class="s2">, </span><span class="s1">ingredientTypes</span><span class="s2">.</span><span class="s1">size</span><span class="s2">()));</span>
+            <span class="s2">}</span>
+
+            <span class="s1">Ingredient newIngredient </span><span class="s2">= </span><span class="s0">new </span><span class="s1">Ingredient</span><span class="s2">(</span><span class="s1">randomType</span><span class="s2">, </span><span class="s1">ingredientSpeed </span><span class="s2">+ </span><span class="s1">random</span><span class="s2">.</span><span class="s1">nextInt</span><span class="s2">(</span><span class="s4">100</span><span class="s2">));</span>
+            <span class="s1">newIngredient</span><span class="s2">.</span><span class="s1">x </span><span class="s2">= </span><span class="s1">random</span><span class="s2">.</span><span class="s1">nextInt</span><span class="s2">((</span><span class="s0">int</span><span class="s2">)</span><span class="s1">getWorldWidth</span><span class="s2">() - </span><span class="s1">INGREDIENT_SIZE</span><span class="s2">);</span>
+            <span class="s1">newIngredient</span><span class="s2">.</span><span class="s1">y </span><span class="s2">= </span><span class="s1">getWorldHeight</span><span class="s2">();</span>
+            <span class="s1">ingredients</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">newIngredient</span><span class="s2">);</span>
+            <span class="s1">spawnTimer </span><span class="s2">= </span><span class="s4">0</span><span class="s2">;</span>
+        <span class="s2">}</span>
+    <span class="s2">}</span>
+
+    <span class="s0">private void </span><span class="s1">updateIngredients</span><span class="s2">(</span><span class="s0">float </span><span class="s1">delta</span><span class="s2">) {</span>
+        <span class="s3">// Update position of all active ingredients</span>
+        <span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">i </span><span class="s2">= </span><span class="s1">ingredients</span><span class="s2">.</span><span class="s1">size</span><span class="s2">() - </span><span class="s4">1</span><span class="s2">; </span><span class="s1">i </span><span class="s2">&gt;= </span><span class="s4">0</span><span class="s2">; </span><span class="s1">i</span><span class="s2">--) {</span>
+            <span class="s1">Ingredient ingredient </span><span class="s2">= </span><span class="s1">ingredients</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s1">i</span><span class="s2">);</span>
+
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">ingredient</span><span class="s2">.</span><span class="s1">active</span><span class="s2">) {</span>
+                <span class="s1">ingredient</span><span class="s2">.</span><span class="s1">y </span><span class="s2">-= </span><span class="s1">ingredient</span><span class="s2">.</span><span class="s1">speed </span><span class="s2">* </span><span class="s1">delta</span><span class="s2">;</span>
+
+                <span class="s3">// Remove ingredients that fall off the bottom of the screen</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">ingredient</span><span class="s2">.</span><span class="s1">y </span><span class="s2">&lt; -</span><span class="s1">INGREDIENT_SIZE</span><span class="s2">) {</span>
+                    <span class="s1">ingredients</span><span class="s2">.</span><span class="s1">remove</span><span class="s2">(</span><span class="s1">i</span><span class="s2">);</span>
+                <span class="s2">}</span>
+            <span class="s2">}</span>
+        <span class="s2">}</span>
+    <span class="s2">}</span>
+
+    <span class="s0">private void </span><span class="s1">checkCollisions</span><span class="s2">() {</span>
+        <span class="s0">for </span><span class="s2">(</span><span class="s1">Ingredient ingredient </span><span class="s2">: </span><span class="s1">ingredients</span><span class="s2">) {</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">ingredient</span><span class="s2">.</span><span class="s1">active </span><span class="s2">&amp;&amp; </span><span class="s1">isColliding</span><span class="s2">(</span><span class="s1">ingredient</span><span class="s2">, </span><span class="s1">bowl</span><span class="s2">)) {</span>
+                <span class="s1">ingredient</span><span class="s2">.</span><span class="s1">active </span><span class="s2">= </span><span class="s0">false</span><span class="s2">; </span><span class="s3">// &quot;Collect&quot; the ingredient</span>
+                <span class="s3">// Here you can add score or handle ingredient collection</span>
+                <span class="s1">System</span><span class="s2">.</span><span class="s1">out</span><span class="s2">.</span><span class="s1">println</span><span class="s2">(</span><span class="s5">&quot;Collected: &quot; </span><span class="s2">+ </span><span class="s1">ingredient</span><span class="s2">.</span><span class="s1">type</span><span class="s2">);</span>
+
+                <span class="s3">//lose a life if wrong ingredient.</span>
+                <span class="s0">if </span><span class="s2">(!</span><span class="s1">neededIngredients</span><span class="s2">.</span><span class="s1">contains</span><span class="s2">(</span><span class="s1">ingredient</span><span class="s2">.</span><span class="s1">type</span><span class="s2">)){</span>
+                    <span class="s1">System</span><span class="s2">.</span><span class="s1">out</span><span class="s2">.</span><span class="s1">println</span><span class="s2">(</span><span class="s5">&quot;wrong!!! -1 life&quot;</span><span class="s2">);</span>
+                    <span class="s1">lives</span><span class="s2">--;</span>
+                <span class="s2">}</span>
+
+                <span class="s3">// Check if caught ingredient is in the level's needed ingredient list</span>
+                <span class="s3">// removes the ingredient from the list if it matches</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">neededIngredients</span><span class="s2">.</span><span class="s1">contains</span><span class="s2">(</span><span class="s1">ingredient</span><span class="s2">.</span><span class="s1">type</span><span class="s2">)){</span>
+                    <span class="s1">neededIngredients</span><span class="s2">.</span><span class="s1">remove</span><span class="s2">(</span><span class="s1">ingredient</span><span class="s2">.</span><span class="s1">type</span><span class="s2">);</span>
+                <span class="s2">}</span>
+
+
+                <span class="s3">// Once all the ingredients have been caught it raises the level and creates the next</span>
+                <span class="s3">// neededIngredients list</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">neededIngredients</span><span class="s2">.</span><span class="s1">isEmpty</span><span class="s2">()){</span>
+                    <span class="s1">currentLevel</span><span class="s2">++;</span>
+                    <span class="s1">setLevel</span><span class="s2">(</span><span class="s1">currentLevel</span><span class="s2">);</span>
+<span class="s3">//                    ArrayList&lt;String&gt; neededIngredientsTemp = new ArrayList&lt;&gt;(recipesArrayList.get(currentLevel - 1).recipeIngredientList);</span>
+<span class="s3">//                    neededIngredients = (ArrayList) neededIngredientsTemp.clone();</span>
+
+                    <span class="s1">memorizeMode </span><span class="s2">= </span><span class="s0">true</span><span class="s2">;</span>
+                    <span class="s1">memorizeTime </span><span class="s2">= </span><span class="s4">3f</span><span class="s2">;</span>
+
+                <span class="s2">}</span>
+            <span class="s2">}</span>
+        <span class="s2">}</span>
+    <span class="s2">}</span>
+
+    <span class="s0">private boolean </span><span class="s1">isColliding</span><span class="s2">(</span><span class="s1">Ingredient ingredient</span><span class="s2">, </span><span class="s1">Bowl bowl</span><span class="s2">) {</span>
+        <span class="s0">return </span><span class="s1">ingredient</span><span class="s2">.</span><span class="s1">x </span><span class="s2">&lt; </span><span class="s1">bowl</span><span class="s2">.</span><span class="s1">x </span><span class="s2">+ </span><span class="s1">BOWL_SIZE </span><span class="s2">&amp;&amp;</span>
+                <span class="s1">ingredient</span><span class="s2">.</span><span class="s1">x </span><span class="s2">+ </span><span class="s1">INGREDIENT_SIZE </span><span class="s2">&gt; </span><span class="s1">bowl</span><span class="s2">.</span><span class="s1">x </span><span class="s2">&amp;&amp;</span>
+                <span class="s1">ingredient</span><span class="s2">.</span><span class="s1">y </span><span class="s2">&lt; </span><span class="s1">bowl</span><span class="s2">.</span><span class="s1">y </span><span class="s2">+ </span><span class="s1">BOWL_SIZE </span><span class="s2">&amp;&amp;</span>
+                <span class="s1">ingredient</span><span class="s2">.</span><span class="s1">y </span><span class="s2">+ </span><span class="s1">INGREDIENT_SIZE </span><span class="s2">&gt; </span><span class="s1">bowl</span><span class="s2">.</span><span class="s1">y</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+
+    <span class="s1">@Override</span>
+    <span class="s0">public void </span><span class="s1">hide</span><span class="s2">() {</span>
+        <span class="s3">//clean up textures</span>
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">disposeTexture</span><span class="s2">(</span><span class="s5">&quot;bowl&quot;</span><span class="s2">);</span>
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">disposeTexture</span><span class="s2">(</span><span class="s5">&quot;background&quot;</span><span class="s2">);</span>
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">disposeTexture</span><span class="s2">(</span><span class="s5">&quot;roboto&quot;</span><span class="s2">);</span>
+        <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">disposeTexture</span><span class="s2">(</span><span class="s5">&quot;life&quot;</span><span class="s2">);</span>
+
+
+        <span class="s3">// Clean up ingredient textures</span>
+        <span class="s0">for </span><span class="s2">(</span><span class="s1">String type </span><span class="s2">: </span><span class="s1">ingredientTypes</span><span class="s2">) {</span>
+            <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">disposeTexture</span><span class="s2">(</span><span class="s1">type</span><span class="s2">);</span>
+        <span class="s2">}</span>
+
+        <span class="s1">ingredients</span><span class="s2">.</span><span class="s1">clear</span><span class="s2">();</span>
+    <span class="s2">}</span>
+
+    <span class="s3">// Read the ingredients.csv into an arraylist</span>
+    <span class="s0">public </span><span class="s1">ArrayList</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">&gt; </span><span class="s1">readCSVIngredients</span><span class="s2">(</span><span class="s1">String filename</span><span class="s2">){</span>
+        <span class="s1">ArrayList</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">&gt; </span><span class="s1">ingredients </span><span class="s2">= </span><span class="s0">new </span><span class="s1">ArrayList</span><span class="s2">&lt;&gt;();</span>
+        <span class="s1">CsvReader reader </span><span class="s2">= </span><span class="s0">new </span><span class="s1">CsvReader</span><span class="s2">(</span><span class="s1">filename</span><span class="s2">);</span>
+        <span class="s1">reader</span><span class="s2">.</span><span class="s1">skipRow</span><span class="s2">();</span>
+        <span class="s1">reader</span><span class="s2">.</span><span class="s1">setSeparator</span><span class="s2">(</span><span class="s5">','</span><span class="s2">);</span>
+        <span class="s0">while</span><span class="s2">(</span><span class="s1">reader</span><span class="s2">.</span><span class="s1">loadRow</span><span class="s2">()){</span>
+            <span class="s1">ingredients</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">reader</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s4">0</span><span class="s2">).</span><span class="s1">trim</span><span class="s2">());</span>
+        <span class="s2">}</span>
+        <span class="s0">return </span><span class="s1">ingredients</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s3">// helper method</span>
+    <span class="s0">public </span><span class="s1">String getTexturePath</span><span class="s2">(</span><span class="s1">String ingredientName</span><span class="s2">) {</span>
+
+        <span class="s0">return </span><span class="s5">&quot;textures/ingredients/&quot; </span><span class="s2">+ </span><span class="s1">ingredientName </span><span class="s2">+ </span><span class="s5">&quot;.png&quot;</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s3">// Read the recipes.csv into an arraylist of Recipes</span>
+    <span class="s0">public static </span><span class="s1">ArrayList</span><span class="s2">&lt;</span><span class="s1">Recipe</span><span class="s2">&gt; </span><span class="s1">readCSVRecipes</span><span class="s2">(</span><span class="s1">String filename</span><span class="s2">){</span>
+        <span class="s1">ArrayList</span><span class="s2">&lt;</span><span class="s1">Recipe</span><span class="s2">&gt; </span><span class="s1">recipes </span><span class="s2">= </span><span class="s0">new </span><span class="s1">ArrayList</span><span class="s2">&lt;&gt;();</span>
+        <span class="s1">CsvReader reader </span><span class="s2">= </span><span class="s0">new </span><span class="s1">CsvReader</span><span class="s2">(</span><span class="s1">filename</span><span class="s2">);</span>
+        <span class="s1">reader</span><span class="s2">.</span><span class="s1">skipRow</span><span class="s2">();</span>
+        <span class="s1">reader</span><span class="s2">.</span><span class="s1">setSeparator</span><span class="s2">(</span><span class="s5">','</span><span class="s2">);</span>
+        <span class="s0">while</span><span class="s2">(</span><span class="s1">reader</span><span class="s2">.</span><span class="s1">loadRow</span><span class="s2">()){</span>
+            <span class="s1">Recipe newRecipe </span><span class="s2">= </span><span class="s0">new </span><span class="s1">Recipe</span><span class="s2">();</span>
+            <span class="s1">newRecipe</span><span class="s2">.</span><span class="s1">phase </span><span class="s2">=(</span><span class="s1">reader</span><span class="s2">.</span><span class="s1">getInt</span><span class="s2">(</span><span class="s4">0</span><span class="s2">));</span>
+            <span class="s1">newRecipe</span><span class="s2">.</span><span class="s1">level </span><span class="s2">=(</span><span class="s1">reader</span><span class="s2">.</span><span class="s1">getInt</span><span class="s2">(</span><span class="s4">1</span><span class="s2">));</span>
+            <span class="s1">newRecipe</span><span class="s2">.</span><span class="s1">name </span><span class="s2">= (</span><span class="s1">reader</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s4">2</span><span class="s2">));</span>
+
+            <span class="s1">newRecipe</span><span class="s2">.</span><span class="s1">recipeIngredientList</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">reader</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s4">3</span><span class="s2">));</span>
+            <span class="s1">newRecipe</span><span class="s2">.</span><span class="s1">recipeIngredientList</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">reader</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s4">4</span><span class="s2">));</span>
+            <span class="s1">newRecipe</span><span class="s2">.</span><span class="s1">recipeIngredientList</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">reader</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s4">5</span><span class="s2">));</span>
+            <span class="s1">newRecipe</span><span class="s2">.</span><span class="s1">recipeIngredientList</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">reader</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s4">6</span><span class="s2">));</span>
+            <span class="s1">newRecipe</span><span class="s2">.</span><span class="s1">recipeIngredientList</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">reader</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s4">7</span><span class="s2">));</span>
+            <span class="s1">newRecipe</span><span class="s2">.</span><span class="s1">recipeIngredientList</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">reader</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s4">8</span><span class="s2">));</span>
+            <span class="s1">newRecipe</span><span class="s2">.</span><span class="s1">recipeIngredientList</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">reader</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s4">9</span><span class="s2">));</span>
+            <span class="s1">newRecipe</span><span class="s2">.</span><span class="s1">recipeIngredientList</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">reader</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s4">10</span><span class="s2">));</span>
+
+            <span class="s3">//remove the ingredients called NULL</span>
+            <span class="s1">newRecipe</span><span class="s2">.</span><span class="s1">recipeIngredientList</span><span class="s2">.</span><span class="s1">removeIf</span><span class="s2">(</span><span class="s1">ingredient -&gt; ingredient</span><span class="s2">.</span><span class="s1">equals</span><span class="s2">(</span><span class="s5">&quot;NULL&quot;</span><span class="s2">));</span>
+
+            <span class="s1">recipes</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">newRecipe</span><span class="s2">);</span>
+        <span class="s2">}</span>
+        <span class="s0">return </span><span class="s1">recipes</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public static int </span><span class="s1">getCurrentLevel</span><span class="s2">(){</span>
+        <span class="s0">return </span><span class="s1">currentLevel</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+
+    <span class="s0">public static void </span><span class="s1">setLevel</span><span class="s2">(</span><span class="s0">int </span><span class="s1">currentLevel</span><span class="s2">){</span>
+        <span class="s1">ArrayList</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">&gt; </span><span class="s1">neededIngredientsTemp </span><span class="s2">= </span><span class="s0">new </span><span class="s1">ArrayList</span><span class="s2">&lt;&gt;(</span><span class="s1">recipesArrayList</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s1">currentLevel </span><span class="s2">- </span><span class="s4">1</span><span class="s2">).</span><span class="s1">recipeIngredientList</span><span class="s2">);</span>
+        <span class="s1">neededIngredients </span><span class="s2">= (</span><span class="s1">ArrayList</span><span class="s2">) </span><span class="s1">neededIngredientsTemp</span><span class="s2">.</span><span class="s1">clone</span><span class="s2">();</span>
+        <span class="s1">lives </span><span class="s2">= </span><span class="s4">3</span><span class="s2">;</span>
+        <span class="s1">System</span><span class="s2">.</span><span class="s1">out</span><span class="s2">.</span><span class="s1">println</span><span class="s2">(</span><span class="s5">&quot;set: current level: &quot;</span><span class="s2">+ </span><span class="s1">currentLevel</span><span class="s2">);</span>
+
+
+    <span class="s2">}</span>
+    <span class="s3">//draw textures for the thee</span>
+    <span class="s0">public static void </span><span class="s1">drawLivesHearts</span><span class="s2">(</span><span class="s0">int </span><span class="s1">lives</span><span class="s2">){</span>
+        <span class="s0">float </span><span class="s1">x</span><span class="s2">= </span><span class="s4">600</span><span class="s2">;</span>
+        <span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">i</span><span class="s2">=</span><span class="s4">1</span><span class="s2">; </span><span class="s1">i</span><span class="s2">&lt;=</span><span class="s1">lives</span><span class="s2">; </span><span class="s1">i</span><span class="s2">++){</span>
+            <span class="s1">GameApp</span><span class="s2">.</span><span class="s1">drawTexture</span><span class="s2">(</span><span class="s5">&quot;life&quot;</span><span class="s2">, </span><span class="s1">x</span><span class="s2">,</span><span class="s1">GameApp</span><span class="s2">.</span><span class="s1">getWorldHeight</span><span class="s2">()-</span><span class="s4">100</span><span class="s2">, </span><span class="s1">BOWL_SIZE</span><span class="s2">, </span><span class="s1">BOWL_SIZE</span><span class="s2">);</span>
+            <span class="s1">x</span><span class="s2">+=</span><span class="s4">60</span><span class="s2">;</span>
+
+
+        <span class="s2">}</span>
+    <span class="s2">}</span>
+
+
+
+<span class="s2">}</span>
+</pre>
+</body>
+</html>
