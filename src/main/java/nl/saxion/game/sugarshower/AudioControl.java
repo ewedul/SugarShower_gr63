@@ -19,7 +19,7 @@ public class AudioControl {
 //    public static void playMusic(String audioName, boolean flag, float volume) {
 //        GameApp.playMusic(audioName, flag, AudioControl.getVolume(volume));
 //    }
-//    public static void playSound(String audioName, float number){
+//    public void playSound(String audioName, float number){
 //        if(!AudioControl.muteMode) {
 //            GameApp.playSound(audioName, number);
 //        }else{

@@ -1,6 +1,8 @@
 package nl.saxion.game.sugarshower;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Music;
 import nl.saxion.gameapp.GameApp;
 import nl.saxion.gameapp.screens.ScalableGameScreen;
 import nl.saxion.app.CsvReader;
@@ -14,6 +16,8 @@ public class YourGameScreen extends ScalableGameScreen {
     public static final int BOWL_SIZE = 100;
     public static final int BOWL_SPEED = 500;
     public static final int INGREDIENT_SIZE = 80;
+    public static final float bgMusicVolume = 0.2f;
+    public static final float soundVolume = 0.5f;
 
     //GAME OBJECTS
     Bowl bowl;
@@ -82,6 +86,12 @@ public class YourGameScreen extends ScalableGameScreen {
             String texturePath = getTexturePath(ingredientName);
             GameApp.addTexture(ingredientName, texturePath);
         }
+        //Load audio
+        GameApp.addMusic("bg-music","audio/The_Biggest_Smile.mp3");
+        GameApp.addSound("correct caught", "audio/correct caught.wav");
+
+        GameApp.playMusic("bg-music",true,AudioControl.getVolume(YourGameScreen.bgMusicVolume));
+
 
 
     }
@@ -104,6 +114,13 @@ public class YourGameScreen extends ScalableGameScreen {
         if (GameApp.isKeyJustPressed(Input.Keys.ESCAPE)){
             GameApp.switchScreen("GameOverScreen");
             //Link to GameOver screen for now until we figure out the level system - Nhi
+        }
+
+        // Mute option
+        if(GameApp.isKeyJustPressed(Input.Keys.M)){
+            AudioControl.toggleMuteMode();
+            Music bgMusic = GameApp.getMusic("bg-music");
+            bgMusic.setVolume(AudioControl.getVolume(YourGameScreen.bgMusicVolume));
         }
 
         // Draw elements
@@ -255,6 +272,9 @@ public class YourGameScreen extends ScalableGameScreen {
         GameApp.disposeTexture("bowl");
         GameApp.disposeTexture("background");
         GameApp.disposeTexture("roboto");
+        //clean up audio
+        GameApp.disposeMusic("bg-music");
+        GameApp.disposeSound("correct caught");
 
 
         // Clean up ingredient textures
@@ -312,5 +332,13 @@ public class YourGameScreen extends ScalableGameScreen {
         return recipes;
     }
 
+    //mute sound effects - testing
+//    public void playSound(String sound,float volume){
+//        if(!AudioControl.muteMode) {
+//            GameApp.playSound(sound, volume);
+//        }else{
+//            GameApp.playSound(sound,volume);
+//        }
+//    }
 
 }

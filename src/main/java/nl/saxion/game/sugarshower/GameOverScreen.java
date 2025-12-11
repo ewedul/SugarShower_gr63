@@ -29,7 +29,7 @@ public class GameOverScreen extends ScalableGameScreen {
         GameApp.addFont("GameOver", "fonts/basic.ttf", 30);
 
         GameApp.addMusic("gameover-music", "audio/gameover-music.mp3");
-        GameApp.playMusic("gameover-music",true,0.2f);
+        GameApp.playMusic("gameover-music",true,AudioControl.getVolume(YourGameScreen.bgMusicVolume));
 
     }
 
@@ -59,7 +59,7 @@ public class GameOverScreen extends ScalableGameScreen {
         if(GameApp.isKeyJustPressed(Input.Keys.M)){
             AudioControl.toggleMuteMode();
             Music bgMusic = GameApp.getMusic("gameover-music");
-            bgMusic.setVolume(AudioControl.getVolume(0.2f));
+            bgMusic.setVolume(AudioControl.getVolume(YourGameScreen.bgMusicVolume));
         }
 
         //Rendering
