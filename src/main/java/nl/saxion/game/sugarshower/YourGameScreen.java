@@ -86,6 +86,7 @@ public class YourGameScreen extends ScalableGameScreen {
         GameApp.addTexture("bowl", "textures/bowl_03.png");
         GameApp.addTexture("life", "textures/life.png");
         GameApp.addTexture("background", "textures/pink-bg.png");
+        GameApp.addTexture("speech_bubble", "textures/speech_bubble.png");
         GameApp.addFont("roboto", "fonts/Roboto_SemiBold.ttf", 20);
 
         // Load all ingredient images using helper method
@@ -93,6 +94,12 @@ public class YourGameScreen extends ScalableGameScreen {
             String texturePath = getTexturePath(ingredientName);
             GameApp.addTexture(ingredientName, texturePath);
         }
+
+        for (Recipe recipe : recipesArrayList) {
+            String texturePath = "textures/" + recipe.name  + ".png";
+            GameApp.addTexture(recipe.name, texturePath);
+        }
+
 
 
     }
@@ -134,13 +141,27 @@ public class YourGameScreen extends ScalableGameScreen {
             return;
         }
 
+        GameApp.drawTexture("speech_bubble", 600, 600, BOWL_SIZE+50, BOWL_SIZE+50);
+
+
         for (Ingredient ingredient : ingredients) {
             if (ingredient.active) {
                 GameApp.drawTexture(ingredient.type, ingredient.x, ingredient.y, INGREDIENT_SIZE, INGREDIENT_SIZE);
             }
         }
 
+        for (Recipe recipe : recipesArrayList) {
+            if (recipe.level == currentLevel) {
+                drawRecipes(currentLevel);
+            }
+        }
+
+        //drawRecipes(currentLevel);
+
+
+
         drawLivesHearts(lives);
+
 
         GameApp.drawTexture("bowl", bowl.x, bowl.y, BOWL_SIZE, BOWL_SIZE);
         GameApp.drawText("roboto", "lives: " + lives, 30,getWorldHeight()-50,"black");
@@ -149,6 +170,10 @@ public class YourGameScreen extends ScalableGameScreen {
         GameApp.drawText("roboto", "Current level:" + recipesArrayList.get(currentLevel-1).level, 30,getWorldHeight()-100,"black");
         GameApp.drawText("roboto", "Recipe to make: " + recipesArrayList.get(currentLevel-1).name, 30,getWorldHeight()-150,"black");
         GameApp.drawText("roboto", "Ingredients needed to make: " + recipesArrayList.get(currentLevel-1).name + " " + neededIngredients.toString() , 30,getWorldHeight()-200,"black");
+
+
+
+
 
         GameApp.endSpriteRendering();
 
@@ -173,9 +198,13 @@ public class YourGameScreen extends ScalableGameScreen {
         float textY = popupY + popupH - 140;
 
         for (String ing : neededIngredients) {
-            GameApp.drawText("roboto", "- " + ing, textX+150, textY, "black");
+            GameApp.drawText("roboto", " - " + ing.replace("_"," "), textX+150, textY, "black");
             textY -= 30;
         }
+
+
+
+
     }
 
     private void popUpRecipeTimer(float delta) {
@@ -267,6 +296,9 @@ public class YourGameScreen extends ScalableGameScreen {
                 if (!neededIngredients.contains(ingredient.type)){
                     System.out.println("wrong!!! -1 life");
                     lives--;
+                    if (ingredient.type.contains("rotten")){
+                        lives--;
+                    }
                 }
 
                 // Check if caught ingredient is in the level's needed ingredient list
@@ -306,6 +338,7 @@ public class YourGameScreen extends ScalableGameScreen {
         GameApp.disposeTexture("bowl");
         GameApp.disposeTexture("background");
         GameApp.disposeTexture("roboto");
+        GameApp.disposeTexture("speech_bubble");
         GameApp.disposeTexture("life");
 
 
@@ -313,6 +346,19 @@ public class YourGameScreen extends ScalableGameScreen {
         for (String type : ingredientTypes) {
             GameApp.disposeTexture(type);
         }
+
+        for (Recipe recipe : recipesArrayList) {
+            if (recipe.level != currentLevel) {
+                GameApp.disposeTexture(recipe.name);
+            }
+        }
+
+        for (Recipe recipe : recipesArrayList) {
+            GameApp.disposeTexture(recipe.name);
+        }
+
+
+
 
         ingredients.clear();
     }
@@ -334,6 +380,8 @@ public class YourGameScreen extends ScalableGameScreen {
 
         return "textures/ingredients/" + ingredientName + ".png";
     }
+
+
 
     // Read the recipes.csv into an arraylist of Recipes
     public static ArrayList<Recipe> readCSVRecipes(String filename){
@@ -378,16 +426,30 @@ public class YourGameScreen extends ScalableGameScreen {
 
     }
     //draw textures for the thee
-    public static void drawLivesHearts(int lives){
-        float x= 600;
-        for (int i=1; i<=lives; i++){
-            GameApp.drawTexture("life", x,GameApp.getWorldHeight()-100, BOWL_SIZE, BOWL_SIZE);
-            x+=60;
+    public static void drawLivesHearts(int lives) {
+        float x = 600;
+        for (int i = 1; i <= lives; i++) {
+            GameApp.drawTexture("life", x, GameApp.getWorldHeight() - 100, BOWL_SIZE, BOWL_SIZE);
+            x += 60;
 
 
         }
     }
 
+    public static void drawRecipes(int currentLevel){
+        GameApp.drawTexture(recipesArrayList.get(currentLevel-1).name,620, 630, INGREDIENT_SIZE, INGREDIENT_SIZE);
+        //System.out.println("current level for drawing recipe img: "+ recipesArrayList.get(currentLevel-1).name + " " + currentLevel);
+
+    }
 
 
-}
+
+
+
+
+
+    }
+
+
+
+
