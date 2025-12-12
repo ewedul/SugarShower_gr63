@@ -56,7 +56,9 @@ public class YourGameScreen extends ScalableGameScreen {
 
     @Override
     public void show() {
-        //currentLevel = 1; // Keeps track of the level
+
+        // Keeps track of the level
+        //currentLevel = 1;
 
 //        neededIngredients = new ArrayList<>(
 //                recipesArrayList.get(currentLevel - 1).recipeIngredientList);
@@ -95,17 +97,19 @@ public class YourGameScreen extends ScalableGameScreen {
             String texturePath = getTexturePath(ingredientName);
             GameApp.addTexture(ingredientName, texturePath);
         }
-        //Load audio
-        GameApp.addMusic("bg-music", "audio/The_Biggest_Smile.mp3");
-        GameApp.addSound("correct caught", "audio/correct caught.wav");
 
-        GameApp.playMusic("bg-music", true, AudioControl.getVolume(YourGameScreen.bgMusicVolume));
-
-
+        //Load the images of all finished products
         for (Recipe recipe : recipesArrayList) {
             String texturePath = "textures/finished_products/" + recipe.name + ".png";
             GameApp.addTexture(recipe.name, texturePath);
         }
+
+        //Load audio
+        GameApp.addMusic("bg-music", "audio/The_Biggest_Smile.mp3");
+        GameApp.addSound("correct caught", "audio/correct caught.wav");
+
+        //Play background music
+        GameApp.playMusic("bg-music", true, AudioControl.getVolume(YourGameScreen.bgMusicVolume));
 
 
     }
@@ -113,6 +117,8 @@ public class YourGameScreen extends ScalableGameScreen {
     @Override
     public void render(float delta) {
         super.render(delta);
+
+        //--------------------------- GAME LOGIC -------------------------------
 
         popUpRecipeTimer(delta);
 
@@ -127,8 +133,7 @@ public class YourGameScreen extends ScalableGameScreen {
 
         // Escape button to exit
         if (GameApp.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            GameApp.switchScreen("GameOverScreen");
-            //Link to GameOver screen for now until we figure out the level system - Nhi
+            GameApp.quit();
         }
 
         if (lives == 0) {
@@ -143,42 +148,45 @@ public class YourGameScreen extends ScalableGameScreen {
             bgMusic.setVolume(AudioControl.getVolume(YourGameScreen.bgMusicVolume));
         }
 
-        // Draw elements
+        //--------------------------- GRAPHIC RENDERING -------------------------------
+
         GameApp.clearScreen();
         GameApp.startSpriteRendering();
         GameApp.drawTexture("background", 0, 0, getWorldWidth(), getWorldHeight());
 
+        //Draw pop-up
         if (memorizeMode) {
             drawRecipePopup();
             GameApp.endSpriteRendering();
             return;
         }
 
+        //Draw bowl
+        GameApp.drawTexture("bowl", bowl.x, bowl.y, BOWL_SIZE, BOWL_SIZE);
+        GameApp.drawText("roboto", "lives: " + lives, 30, getWorldHeight() - 50, "black");
+
+        //Draw bubble with image of finished product (ordered item)
         GameApp.drawTexture("speech_bubble", 600, 600, BOWL_SIZE + 50, BOWL_SIZE + 50);
-
-
-        for (Ingredient ingredient : ingredients) {
-            if (ingredient.active) {
-                GameApp.drawTexture(ingredient.type, ingredient.x, ingredient.y, INGREDIENT_SIZE, INGREDIENT_SIZE);
-            }
-        }
 
         for (Recipe recipe : recipesArrayList) {
             if (recipe.level == currentLevel) {
                 drawRecipes(currentLevel);
             }
         }
-
         //drawRecipes(currentLevel);
 
 
+        //Draw images of falling items in their coordinates
+        for (Ingredient ingredient : ingredients) {
+            if (ingredient.active) {
+                GameApp.drawTexture(ingredient.type, ingredient.x, ingredient.y, INGREDIENT_SIZE, INGREDIENT_SIZE);
+            }
+        }
+
+        //Draw hearts to visualize player's lives
         drawLivesHearts(lives);
 
-
-        GameApp.drawTexture("bowl", bowl.x, bowl.y, BOWL_SIZE, BOWL_SIZE);
-        GameApp.drawText("roboto", "lives: " + lives, 30, getWorldHeight() - 50, "black");
-
-        // print the current level and the level recipe
+        //Draw information of current level and the level recipe
         GameApp.drawText("roboto", "Current level:" + recipesArrayList.get(currentLevel - 1).level, 30, getWorldHeight() - 100, "black");
         GameApp.drawText("roboto", "Recipe to make: " + recipesArrayList.get(currentLevel - 1).name, 30, getWorldHeight() - 150, "black");
         GameApp.drawText("roboto", "Ingredients needed to make: " + recipesArrayList.get(currentLevel - 1).name + " " + neededIngredients.toString(), 30, getWorldHeight() - 200, "black");
@@ -248,7 +256,8 @@ public class YourGameScreen extends ScalableGameScreen {
             ingredientSpeed += 100;
         }
 
-        //A limit to adjust levels not to go too fast.
+        //Decrese spawning interval by 0.03 per level.
+        //Add limit to adjust levels not to go too fast.
         float adjustedSpawnInterval = spawnInterval;
         adjustedSpawnInterval -= currentLevel * 0.03f;
 
@@ -257,6 +266,7 @@ public class YourGameScreen extends ScalableGameScreen {
         }
 
 
+        //Control the diversity of falling objects
         if (spawnTimer >= adjustedSpawnInterval) {
             String randomType;
 
@@ -275,7 +285,7 @@ public class YourGameScreen extends ScalableGameScreen {
                 randomType = ingredientTypes.get(SaxionApp.getRandomValueBetween(0, ingredientTypes.size()));
             }
 
-            //Spawn Item Duplicate Setting
+            //Prevent too many duplicate items falling at same time
             if (lastSpawnedType != null) {
                 while (randomType.equals(lastSpawnedType)) {
                     randomType = ingredientTypes.get(
@@ -451,7 +461,7 @@ public class YourGameScreen extends ScalableGameScreen {
 
     }
 
-    //draw textures for the thee
+    //draw textures for the three lives
     public static void drawLivesHearts(int lives) {
         float x = 600;
         for (int i = 1; i <= lives; i++) {
@@ -464,6 +474,7 @@ public class YourGameScreen extends ScalableGameScreen {
 
     public static void drawRecipes(int currentLevel) {
         GameApp.drawTexture(recipesArrayList.get(currentLevel - 1).name, 620, 630, INGREDIENT_SIZE, INGREDIENT_SIZE);
+
         //mute sound effects - testing
 //    public void playSound(String sound,float volume){
 //        if(!AudioControl.muteMode) {
