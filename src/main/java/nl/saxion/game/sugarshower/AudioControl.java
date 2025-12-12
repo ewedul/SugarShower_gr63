@@ -10,21 +10,12 @@ public class AudioControl {
         muteMode = !muteMode;
     }
 
-    public static float getVolume(float volume) {
-        return muteMode ? 0f : volume;
+    public static void playMusic(String audioName, boolean flag, float volume) {
+        GameApp.playMusic(audioName, flag, AudioControl.muteMode? 0f:volume);
     }
 
-
-//   Testing feature
-//    public static void playMusic(String audioName, boolean flag, float volume) {
-//        GameApp.playMusic(audioName, flag, AudioControl.getVolume(volume));
-//    }
-//    public void playSound(String audioName, float number){
-//        if(!AudioControl.muteMode) {
-//            GameApp.playSound(audioName, number);
-//        }else{
-//            GameApp.playSound(audioName,0f);
-//        }
-//    }
+    public static void playSound(String audioName, float volume) {
+        GameApp.playSound(audioName, AudioControl.muteMode ? 0f : volume);
+    }
 
 }
