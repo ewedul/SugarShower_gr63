@@ -30,7 +30,7 @@ public class GameOverScreen extends ScalableGameScreen {
         GameApp.addFont("GameOver", "fonts/basic.ttf", 30);
 
         GameApp.addMusic("gameover-music", "audio/gameover-music.mp3");
-        GameApp.playMusic("gameover-music",true,AudioControl.getVolume(YourGameScreen.bgMusicVolume));
+        AudioControl.playMusic("gameover-music", true, YourGameScreen.bgMusicVolume);
 
     }
 
@@ -60,12 +60,11 @@ public class GameOverScreen extends ScalableGameScreen {
             }
         }
 
-        //Press M to turn on Mute Mode. Testing
-        //Further testing:Put all audio into ArrayList later, run for-loop, setVolume
-        if(GameApp.isKeyJustPressed(Input.Keys.M)){
+        //Press M to turn on Mute Mode.
+        if (GameApp.isKeyJustPressed(Input.Keys.M)) {
             AudioControl.toggleMuteMode();
-            Music bgMusic = GameApp.getMusic("gameover-music");
-            bgMusic.setVolume(AudioControl.getVolume(YourGameScreen.bgMusicVolume));
+            GameApp.getMusic("gameover-music").
+                    setVolume(AudioControl.muteMode ? 0f : YourGameScreen.bgMusicVolume);
         }
 
         //Rendering

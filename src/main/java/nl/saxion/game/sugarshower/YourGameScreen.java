@@ -17,8 +17,8 @@ public class YourGameScreen extends ScalableGameScreen {
     public static final int BOWL_SIZE = 75;
     public static final int BOWL_SPEED = 600;
     public static final int INGREDIENT_SIZE = 80;
-    public static final float bgMusicVolume = 0.2f;
-    public static final float soundVolume = 0.5f;
+    public static final float bgMusicVolume =0.5f;
+    public static final float soundVolume = 0.8f;
 
     //GAME OBJECTS
     Bowl bowl;
@@ -97,9 +97,10 @@ public class YourGameScreen extends ScalableGameScreen {
         }
         //Load audio
         GameApp.addMusic("bg-music", "audio/The_Biggest_Smile.mp3");
-        GameApp.addSound("correct caught", "audio/correct caught.wav");
+        GameApp.addSound("correct caught", "audio/correct caught.ogg");
+        GameApp.addSound("bad caught","audio/Bottle Break.wav");
 
-        GameApp.playMusic("bg-music", true, AudioControl.getVolume(YourGameScreen.bgMusicVolume));
+        AudioControl.playMusic("bg-music", true, bgMusicVolume);
 
 
         for (Recipe recipe : recipesArrayList) {
@@ -139,8 +140,7 @@ public class YourGameScreen extends ScalableGameScreen {
         // Mute option
         if (GameApp.isKeyJustPressed(Input.Keys.M)) {
             AudioControl.toggleMuteMode();
-            Music bgMusic = GameApp.getMusic("bg-music");
-            bgMusic.setVolume(AudioControl.getVolume(YourGameScreen.bgMusicVolume));
+            GameApp.getMusic("bg-music").setVolume(AudioControl.muteMode? 0f:bgMusicVolume);
         }
 
         // Draw elements
@@ -319,6 +319,7 @@ public class YourGameScreen extends ScalableGameScreen {
 
                 //lose a life if wrong ingredient.
                 if (!neededIngredients.contains(ingredient.type)) {
+                    AudioControl.playSound("bad caught",soundVolume);
                     System.out.println("wrong!!! -1 life");
                     lives--;
                     if (ingredient.type.contains("rotten")) {
@@ -330,6 +331,7 @@ public class YourGameScreen extends ScalableGameScreen {
                 // removes the ingredient from the list if it matches
                 if (neededIngredients.contains(ingredient.type)) {
                     neededIngredients.remove(ingredient.type);
+                    AudioControl.playSound("correct caught", soundVolume);
                 }
 
 
@@ -365,9 +367,11 @@ public class YourGameScreen extends ScalableGameScreen {
         GameApp.disposeTexture("roboto");
         GameApp.disposeTexture("speech_bubble");
         GameApp.disposeTexture("life");
+
         //clean up audio
         GameApp.disposeMusic("bg-music");
         GameApp.disposeSound("correct caught");
+        GameApp.disposeSound("bad caught");
 
 
         // Clean up ingredient textures
@@ -464,17 +468,9 @@ public class YourGameScreen extends ScalableGameScreen {
 
     public static void drawRecipes(int currentLevel) {
         GameApp.drawTexture(recipesArrayList.get(currentLevel - 1).name, 620, 630, INGREDIENT_SIZE, INGREDIENT_SIZE);
-        //mute sound effects - testing
-//    public void playSound(String sound,float volume){
-//        if(!AudioControl.muteMode) {
-//            GameApp.playSound(sound, volume);
-//        }else{
-//            GameApp.playSound(sound,volume);
-//        }
-//    }
+
 
     }
-
 
 }
 
