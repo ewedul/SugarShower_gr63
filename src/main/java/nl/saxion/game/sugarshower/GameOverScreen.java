@@ -38,7 +38,7 @@ public class GameOverScreen extends ScalableGameScreen {
     public void render(float delta) {
         super.render(delta);
 
-        //Input logic
+        //=================Input logic=================
         if (GameApp.isKeyJustPressed(Input.Keys.DOWN)) {
             selectedItem = (selectedItem + 1) % 2;
         } else if (GameApp.isKeyJustPressed(Input.Keys.UP)) {
@@ -67,7 +67,7 @@ public class GameOverScreen extends ScalableGameScreen {
                     setVolume(AudioControl.muteMode ? 0f : YourGameScreen.bgMusicVolume);
         }
 
-        //Rendering
+        //=================Graphic rendering=================//
         GameApp.clearScreen();
 
         GameApp.startSpriteRendering();

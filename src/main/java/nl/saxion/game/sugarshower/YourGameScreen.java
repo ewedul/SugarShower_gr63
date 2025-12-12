@@ -478,15 +478,6 @@ public class YourGameScreen extends ScalableGameScreen {
     public static void drawRecipes(int currentLevel) {
         GameApp.drawTexture(recipesArrayList.get(currentLevel - 1).name, 620, 630, INGREDIENT_SIZE, INGREDIENT_SIZE);
 
-        //mute sound effects - testing
-//    public void playSound(String sound,float volume){
-//        if(!AudioControl.muteMode) {
-//            GameApp.playSound(sound, volume);
-//        }else{
-//            GameApp.playSound(sound,volume);
-//        }
-//    }
-
 
     }
 
