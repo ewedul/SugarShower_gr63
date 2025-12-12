@@ -17,7 +17,7 @@ public class YourGameScreen extends ScalableGameScreen {
     public static final int BOWL_SIZE = 75;
     public static final int BOWL_SPEED = 600;
     public static final int INGREDIENT_SIZE = 80;
-    public static final float bgMusicVolume =0.5f;
+    public static final float bgMusicVolume = 0.5f;
     public static final float soundVolume = 0.8f;
 
     //GAME OBJECTS
@@ -87,6 +87,9 @@ public class YourGameScreen extends ScalableGameScreen {
 
         // TEXTURES
         GameApp.addTexture("bowl", "textures/bowl_03.png");
+        GameApp.addTexture("banner", "textures/banner.png");
+        GameApp.addTexture("customer_1", "textures/customer_1.png");
+
         GameApp.addTexture("life", "textures/life.png");
         GameApp.addTexture("background", "textures/pink-bg.png");
         GameApp.addTexture("speech_bubble", "textures/speech_bubble.png");
@@ -107,7 +110,7 @@ public class YourGameScreen extends ScalableGameScreen {
         //Load audio
         GameApp.addMusic("bg-music", "audio/The_Biggest_Smile.mp3");
         GameApp.addSound("correct caught", "audio/correct caught.ogg");
-        GameApp.addSound("bad caught","audio/Bottle Break.wav");
+        GameApp.addSound("bad caught", "audio/Bottle Break.wav");
 
         //Play background music
         AudioControl.playMusic("bg-music", true, bgMusicVolume);
@@ -145,7 +148,7 @@ public class YourGameScreen extends ScalableGameScreen {
         // Mute option
         if (GameApp.isKeyJustPressed(Input.Keys.M)) {
             AudioControl.toggleMuteMode();
-            GameApp.getMusic("bg-music").setVolume(AudioControl.muteMode? 0f:bgMusicVolume);
+            GameApp.getMusic("bg-music").setVolume(AudioControl.muteMode ? 0f : bgMusicVolume);
         }
 
         //--------------------------- GRAPHIC RENDERING -------------------------------
@@ -163,10 +166,12 @@ public class YourGameScreen extends ScalableGameScreen {
 
         //Draw bowl
         GameApp.drawTexture("bowl", bowl.x, bowl.y, BOWL_SIZE, BOWL_SIZE);
-        GameApp.drawText("roboto", "lives: " + lives, 30, getWorldHeight() - 50, "black");
+        //GameApp.drawText("roboto", "lives: " + lives, 30, getWorldHeight() - 50, "black");
 
-        //Draw bubble with image of finished product (ordered item)
-        GameApp.drawTexture("speech_bubble", 600, 600, BOWL_SIZE + 50, BOWL_SIZE + 50);
+
+        //Draw banner in the centre
+        GameApp.drawTexture("banner", getWorldWidth() / 7, getWorldHeight()-180, 600, 200);
+
 
         for (Recipe recipe : recipesArrayList) {
             if (recipe.level == currentLevel) {
@@ -187,9 +192,9 @@ public class YourGameScreen extends ScalableGameScreen {
         drawLivesHearts(lives);
 
         //Draw information of current level and the level recipe
-        GameApp.drawText("roboto", "Current level:" + recipesArrayList.get(currentLevel - 1).level, 30, getWorldHeight() - 100, "black");
-        GameApp.drawText("roboto", "Recipe to make: " + recipesArrayList.get(currentLevel - 1).name, 30, getWorldHeight() - 150, "black");
-        GameApp.drawText("roboto", "Ingredients needed to make: " + recipesArrayList.get(currentLevel - 1).name + " " + neededIngredients.toString(), 30, getWorldHeight() - 200, "black");
+        GameApp.drawText("roboto", "Level:" + recipesArrayList.get(currentLevel - 1).level + " - " + recipesArrayList.get(currentLevel - 1).name, getWorldWidth() / (float) 2.6, getWorldHeight() - 70, "black");
+        //GameApp.drawText("roboto", "Recipe to make: " + recipesArrayList.get(currentLevel - 1).name, 30, getWorldHeight() - 150, "black");
+        GameApp.drawText("roboto", "Ingredients needed to make: " + neededIngredients.toString(), 30, getWorldHeight() - 200, "black");
 
 
         GameApp.endSpriteRendering();
@@ -240,7 +245,8 @@ public class YourGameScreen extends ScalableGameScreen {
         }
 
         bowl.y = GameApp.clamp(bowl.y, 0, getWorldHeight() - BOWL_SIZE);
-        bowl.x = GameApp.clamp(bowl.x, 0, getWorldWidth() - BOWL_SIZE);
+        // Added some boundary space where the bowl can't go (100 each side)
+        bowl.x = GameApp.clamp(bowl.x, 100, getWorldWidth() - (BOWL_SIZE+100));
     }
 
     private void spawnIngredients(float delta) {
@@ -297,8 +303,10 @@ public class YourGameScreen extends ScalableGameScreen {
             }
 
             Ingredient newIngredient = new Ingredient(randomType, ingredientSpeed + random.nextInt(100));
-            newIngredient.x = random.nextInt((int) getWorldWidth() - INGREDIENT_SIZE);
-            newIngredient.y = getWorldHeight();
+
+            // Added some boundaries for the ingredients to fall below the banner and with some buffer space to the sides
+            newIngredient.x = random.nextInt(100,(int) getWorldWidth() - (INGREDIENT_SIZE+100));
+            newIngredient.y = getWorldHeight()-200;
             ingredients.add(newIngredient);
             spawnTimer = 0;
         }
@@ -329,12 +337,17 @@ public class YourGameScreen extends ScalableGameScreen {
 
                 //lose a life if wrong ingredient.
                 if (!neededIngredients.contains(ingredient.type)) {
-                    AudioControl.playSound("bad caught",soundVolume);
-                    System.out.println("wrong!!! -1 life");
-                    lives--;
-                    if (ingredient.type.contains("rotten")) {
+
+                    if (ingredient.type.equals("life") && lives < 3) {
+                        lives++;
+                    } else if (ingredient.type.contains("rotten")) {
+                        lives = lives - 2;
+                    } else if (!ingredient.type.equals("life")) {
+                        AudioControl.playSound("bad caught", soundVolume);
+                        System.out.println("wrong!!! -1 life");
                         lives--;
                     }
+
                 }
 
                 // Check if caught ingredient is in the level's needed ingredient list
@@ -377,6 +390,8 @@ public class YourGameScreen extends ScalableGameScreen {
         GameApp.disposeTexture("roboto");
         GameApp.disposeTexture("speech_bubble");
         GameApp.disposeTexture("life");
+        GameApp.disposeTexture("banner");
+        GameApp.disposeTexture("customer_1");
         //clean up audio
         GameApp.disposeMusic("bg-music");
         GameApp.disposeSound("correct caught");
@@ -466,17 +481,23 @@ public class YourGameScreen extends ScalableGameScreen {
 
     //draw textures for the three lives
     public static void drawLivesHearts(int lives) {
-        float x = 600;
+        float x = GameApp.getWorldWidth() / (float) 2.4;
         for (int i = 1; i <= lives; i++) {
-            GameApp.drawTexture("life", x, GameApp.getWorldHeight() - 100, BOWL_SIZE, BOWL_SIZE);
-            x += 60;
+            GameApp.drawTexture("life", x, GameApp.getWorldHeight() - 130, BOWL_SIZE - 20, BOWL_SIZE - 20);
+            x += 45;
 
 
         }
     }
 
     public static void drawRecipes(int currentLevel) {
-        GameApp.drawTexture(recipesArrayList.get(currentLevel - 1).name, 620, 630, INGREDIENT_SIZE, INGREDIENT_SIZE);
+
+        //Draw bubble with image of finished product (ordered item)
+        GameApp.drawTexture("speech_bubble", GameApp.getWorldWidth()-150, GameApp.getWorldHeight()-200, BOWL_SIZE + 50, BOWL_SIZE + 50);
+        //Draw a customer
+        GameApp.drawTexture("customer_1", GameApp.getWorldWidth()-100, GameApp.getWorldHeight()-260, BOWL_SIZE , BOWL_SIZE );
+
+        GameApp.drawTexture(recipesArrayList.get(currentLevel - 1).name, GameApp.getWorldWidth()-120, GameApp.getWorldHeight()-170, INGREDIENT_SIZE, INGREDIENT_SIZE);
 
 
     }
