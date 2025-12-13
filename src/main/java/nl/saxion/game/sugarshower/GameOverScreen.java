@@ -75,14 +75,19 @@ public class GameOverScreen extends ScalableGameScreen {
         GameApp.drawTextHorizontallyCentered("GameOver", "Looks like things got a little messy...", worldWidth / 2, worldHeight / 2 + 50, "teal-900");
 
         if (selectedItem == 0) {
-            GameApp.drawTextHorizontallyCentered("GameOver", "Retry the level", worldWidth / 2, worldHeight / 2, "yellow-500");
-        } else {
-            GameApp.drawTextHorizontallyCentered("GameOver", "Retry the level", worldWidth / 2, worldHeight / 2, "teal-900");
-        }
-        if (selectedItem == 1) {
-            GameApp.drawTextHorizontallyCentered("GameOver", "Quit", worldWidth / 2, worldHeight / 2 - 50, "yellow-500");
-        } else {
-            GameApp.drawTextHorizontallyCentered("GameOver", "Quit", worldWidth / 2, worldHeight / 2 - 50, "teal-900");
+            GameApp.drawTextHorizontallyCentered("GameOver", "Retry the level",
+                    worldWidth / 2, worldHeight / 2, "yellow-500");
+
+            GameApp.drawTextHorizontallyCentered("GameOver", "Quit",
+                    worldWidth / 2, worldHeight / 2 - 50, "teal-900");
+
+        } else if (selectedItem == 1) {
+            GameApp.drawTextHorizontallyCentered("GameOver", "Retry the level",
+                    worldWidth / 2, worldHeight / 2, "teal-900");
+
+            GameApp.drawTextHorizontallyCentered("GameOver", "Quit",
+                    worldWidth / 2, worldHeight / 2 - 50, "yellow-500");
+
         }
 
         GameApp.endSpriteRendering();

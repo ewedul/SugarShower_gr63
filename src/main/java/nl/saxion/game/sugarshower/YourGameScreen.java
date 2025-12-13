@@ -140,7 +140,7 @@ public class YourGameScreen extends ScalableGameScreen {
             GameApp.quit();
         }
 
-        if (lives == 0) {
+        if (lives <= 0) {
             GameApp.switchScreen("GameOverScreen");
             //Link to GameOver screen for now until we figure out the level system - Nhi
         }

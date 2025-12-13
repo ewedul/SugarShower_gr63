@@ -54,6 +54,47 @@ public class MainMenuScreen extends ScalableGameScreen {
             }
         }
 
+        // Button dimensions - Nhi: sorry Candy, I move this up to calculate variables for my code
+        float normalWidth = 300;
+        float normalHeight = 180;
+        float selectedWidth = 350;
+        float selectedHeight = 230;
+
+        // Button dimensions depending on selection.
+        float startWidth  = (selectedButton == 0) ? selectedWidth : normalWidth;
+        float startHeight = (selectedButton == 0) ? selectedHeight : normalHeight;
+
+        float exitWidth  = (selectedButton== 1) ? selectedWidth : normalWidth;
+        float exitHeight = (selectedButton== 1) ? selectedHeight : normalHeight;
+
+        // Button positions (centered horizontally)
+        float centerX = getWorldWidth() / 2;
+        float startButtonY = (getWorldHeight()-300) / 2 + 67; // Higher position
+        float exitButtonY = (getWorldHeight()-300) / 2 - 67;  // Lower position
+
+        //Use mouse input to choose
+        float mouseX = getMouseX();
+        float mouseY = getMouseY();
+
+        //World coordinate of button (different due to drawTextureCentered method)
+        float startX = centerX-normalWidth/2;
+        float startY = startButtonY - normalHeight/2;
+        float exitY = exitButtonY - normalHeight/2;
+
+        //Button changes size when hovering mouse over it. Click to choose.
+        if (GameApp.pointInRect(mouseX, mouseY, startX, startY, normalWidth, normalHeight)) {
+            selectedButton = 0;
+            if (GameApp.isButtonJustPressed(Input.Buttons.LEFT)) {
+                GameApp.switchScreen("YourGameScreen");
+            }
+        } else if (GameApp.pointInRect(mouseX, mouseY, startX, exitY, normalWidth, normalHeight)) {
+            selectedButton = 1;
+            if (GameApp.isButtonJustPressed(Input.Buttons.LEFT)) {
+                GameApp.quit();
+            }
+        }
+
+
         // ===== RENDERING =====
         GameApp.clearScreen();
         GameApp.startSpriteRendering();
@@ -61,41 +102,26 @@ public class MainMenuScreen extends ScalableGameScreen {
         // Draw background (full screen)
         GameApp.drawTexture("mainmenu", 0, 0, getWorldWidth(), getWorldHeight());
 
-        // Button dimensions
-        float normalWidth = 300;
-        float normalHeight = 180;
-        float selectedWidth = 350;
-        float selectedHeight = 230;
-
-        // Button positions (centered horizontally)
-        float centerX = getWorldWidth() / 2;
-        float startButtonY = (getWorldHeight()-300) / 2 + 67; // Higher position
-        float exitButtonY = (getWorldHeight()-300) / 2 - 67;  // Lower position
-
-        // Draw START button (centered)
+        // Draw button (centered)
         if (selectedButton == 0) {
             // Start button is SELECTED - use larger highlighted texture
             GameApp.drawTextureCentered("start_button_selected",
                     centerX, startButtonY,
                     selectedWidth, selectedHeight);
-        } else {
-            // Start button is NOT selected - use normal texture
-            GameApp.drawTextureCentered("start_button_normal",
-                    centerX, startButtonY,
-                    normalWidth, normalHeight);
-        }
-
-        // Draw EXIT button (centered)
-        if (selectedButton == 1) {
-            // Exit button is SELECTED - use larger highlighted texture
-            GameApp.drawTextureCentered("exit_button_selected",
-                    centerX, exitButtonY,
-                    selectedWidth, selectedHeight);
-        } else {
             // Exit button is NOT selected - use normal texture
             GameApp.drawTextureCentered("exit_button_normal",
                     centerX, exitButtonY,
                     normalWidth, normalHeight);
+
+        } else if (selectedButton ==1){
+            // Start button is NOT selected - use normal texture
+            GameApp.drawTextureCentered("start_button_normal",
+                    centerX, startButtonY,
+                    normalWidth, normalHeight);
+            // Exit button is SELECTED - use larger highlighted texture
+            GameApp.drawTextureCentered("exit_button_selected",
+                    centerX, exitButtonY,
+                    selectedWidth, selectedHeight);
         }
 
         GameApp.endSpriteRendering();
