@@ -72,7 +72,8 @@ public class GameOverScreen extends ScalableGameScreen {
 
         GameApp.startSpriteRendering();
         GameApp.drawTexture("background", 0, 0, worldWidth, worldHeight);
-        GameApp.drawTextHorizontallyCentered("GameOver", "Looks like things got a little messy...", worldWidth / 2, worldHeight / 2 + 50, "teal-900");
+        GameApp.drawTextHorizontallyCentered("GameOver", "Looks like things got a little messy...",
+                worldWidth / 2, worldHeight / 2 + 50, "teal-900");
 
         if (selectedItem == 0) {
             GameApp.drawTextHorizontallyCentered("GameOver", "Retry the level",

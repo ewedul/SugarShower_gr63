@@ -60,13 +60,6 @@ public class MainMenuScreen extends ScalableGameScreen {
         float selectedWidth = 350;
         float selectedHeight = 230;
 
-        // Button dimensions depending on selection.
-        float startWidth  = (selectedButton == 0) ? selectedWidth : normalWidth;
-        float startHeight = (selectedButton == 0) ? selectedHeight : normalHeight;
-
-        float exitWidth  = (selectedButton== 1) ? selectedWidth : normalWidth;
-        float exitHeight = (selectedButton== 1) ? selectedHeight : normalHeight;
-
         // Button positions (centered horizontally)
         float centerX = getWorldWidth() / 2;
         float startButtonY = (getWorldHeight()-300) / 2 + 67; // Higher position
