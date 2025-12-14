@@ -44,7 +44,6 @@ public class YourGameScreen extends ScalableGameScreen {
     int countIngredientsCaught;
 
     static int lives = 3;
-    int score = 0;
 
     //POPUP -- Memorize Recipe
     boolean memorizeMode = true;
@@ -63,8 +62,9 @@ public class YourGameScreen extends ScalableGameScreen {
 //        neededIngredients = new ArrayList<>(
 //                recipesArrayList.get(currentLevel - 1).recipeIngredientList);
         setLevel(currentLevel);
-//        neededIngredientsTemp = new ArrayList<String>(recipesArrayList.get(currentLevel - 1).recipeIngredientList);
-//        neededIngredients = (ArrayList) neededIngredientsTemp.clone();
+
+        // clear ing for the new level
+        caughtIngredients.clear();
 
 
         //Pop-up setup.
@@ -329,15 +329,16 @@ public class YourGameScreen extends ScalableGameScreen {
     }
 
     private void checkCollisions() {
-        for (Ingredient ingredient : ingredients) {
+        for (int i = ingredients.size() - 1; i >= 0; i--) {
+            Ingredient ingredient = ingredients.get(i);
+
             if (ingredient.active && isColliding(ingredient, bowl)) {
-                ingredient.active = false; // "Collect" the ingredient
-                // Here you can add score or handle ingredient collection
+                ingredient.active = false;
                 System.out.println("Collected: " + ingredient.type);
 
-                //lose a life if wrong ingredient.
+                // Check if it's a WRONG ingredient first
                 if (!neededIngredients.contains(ingredient.type)) {
-
+                    // Handle special ingredients
                     if (ingredient.type.equals("life") && lives < 3) {
                         lives++;
                     } else if (ingredient.type.contains("rotten")) {
@@ -347,29 +348,42 @@ public class YourGameScreen extends ScalableGameScreen {
                         System.out.println("wrong!!! -1 life");
                         lives--;
                     }
-
-                }
-
-                // Check if caught ingredient is in the level's needed ingredient list
-                // removes the ingredient from the list if it matches
-                if (neededIngredients.contains(ingredient.type)) {
+                } else {
+                    // CORRECT ingredient caught!
                     neededIngredients.remove(ingredient.type);
+                    caughtIngredients.add(ingredient.type); // ← IMPORTANT: Track what was caught
                     AudioControl.playSound("correct caught", soundVolume);
+                    System.out.println("✓ Correct! Still need: " + neededIngredients);
                 }
 
+                // Remove the caught ingredient from the game
+                ingredients.remove(i);
 
-                // Once all the ingredients have been caught it raises the level and creates the next
-                // neededIngredients list
+                // Check if level is complete
                 if (neededIngredients.isEmpty()) {
+                    System.out.println("★★★ LEVEL COMPLETE! ★★★");
+
+                    // Pass recipe data to Level Complete Screen
+                    Recipe completedRecipe = recipesArrayList.get(currentLevel - 1);
+                    LevelCompleteScreen.setCompletedRecipe(completedRecipe, caughtIngredients);
+
+                    // Advance to next level
                     currentLevel++;
-                    setLevel(currentLevel);
-//                    ArrayList<String> neededIngredientsTemp = new ArrayList<>(recipesArrayList.get(currentLevel - 1).recipeIngredientList);
-//                    neededIngredients = (ArrayList) neededIngredientsTemp.clone();
 
-                    memorizeMode = true;
-                    memorizeTime = 3f;
+                    // Check if all levels are complete
+                    if (currentLevel > recipesArrayList.size()) {
+                        System.out.println("🎉 ALL LEVELS COMPLETE! 🎉");
+                        // TODO: Create a VictoryScreen for final celebration
+                        GameApp.switchScreen("MainMenuScreen");
+                        return;
+                    }
 
+                    // Show Level Complete Screen
+                    GameApp.switchScreen("LevelCompleteScreen");
+                    return;
                 }
+
+                break; // Only process one collision per frame
             }
         }
     }
