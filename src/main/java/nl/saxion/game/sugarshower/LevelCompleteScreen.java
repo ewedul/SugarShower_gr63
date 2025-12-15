@@ -101,10 +101,6 @@ public class LevelCompleteScreen extends ScalableGameScreen {
         // Draw CUSTOM background (full screen)
         GameApp.drawTexture("levelcomplete_bg", 0, 0, getWorldWidth(), getWorldHeight());
 
-        // Draw title with BUBBLE font
-        GameApp.drawTextHorizontallyCentered("bubble", "Level Complete!",
-                getWorldWidth() / 2, getWorldHeight() - 20, "white");
-
         // Draw subtitle with smaller bubble font
         GameApp.drawText("bubble_small", completedRecipe.name.replace("_", " "),
                 80, 550, "customLine");
@@ -166,9 +162,6 @@ public class LevelCompleteScreen extends ScalableGameScreen {
         GameApp.drawTexture("next_button_selected", buttonX, buttonY,
                 buttonWidth, buttonHeight);
 
-        // Draw instruction text with bubble font
-        GameApp.drawTextHorizontallyCentered("bubble_small", "Press ENTER to continue",
-                getWorldWidth() / 2, 50, "white");
 
         GameApp.endSpriteRendering();
     }
