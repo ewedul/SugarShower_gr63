@@ -4,6 +4,8 @@ import com.badlogic.gdx.Input;
 import nl.saxion.gameapp.GameApp;
 import nl.saxion.gameapp.screens.ScalableGameScreen;
 import nl.saxion.app.CsvReader;
+import org.lwjgl.system.windows.INPUT;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -82,6 +84,18 @@ public class LevelCompleteScreen extends ScalableGameScreen {
     public void render(float delta) {
         super.render(delta);
 
+        // Coordinate of "NEXT" button at bottom right
+        float buttonWidth = 150;
+        float buttonHeight = 60;
+        float buttonX = getWorldWidth() - buttonWidth - 50;
+        float buttonY = 100;
+
+        //Click on "NEXT" button to continue to next level
+        if (GameApp.pointInRect(getMouseX(), getMouseY(), buttonX, buttonY, buttonWidth, buttonHeight)
+                && GameApp.isButtonJustPressed(Input.Buttons.LEFT)) {
+            GameApp.switchScreen("YourGameScreen");
+        }
+
         // Press ENTER or SPACE to continue to next level
         if (GameApp.isKeyJustPressed(Input.Keys.ENTER) ||
                 GameApp.isKeyJustPressed(Input.Keys.SPACE)) {
@@ -152,15 +166,16 @@ public class LevelCompleteScreen extends ScalableGameScreen {
             currentY -= rowHeight; // Move down for next ingredient
         }
 
-        // Draw "NEXT" button at bottom right
-        float buttonWidth = 150;
-        float buttonHeight = 60;
-        float buttonX = getWorldWidth() - buttonWidth - 50;
-        float buttonY = 100;
+        //Coordinate of "NEXT" text in button
+        float textWidth = GameApp.getTextWidth("bubble_small","NEXT");
+        float nextX = buttonX + (buttonWidth - textWidth)/2;
+        float nextY = buttonY+((buttonHeight-25)/2);
+
 
         // Draw button (always show selected since it's the only button)
         GameApp.drawTexture("next_button_selected", buttonX, buttonY,
                 buttonWidth, buttonHeight);
+        GameApp.drawText("bubble_small","NEXT", nextX, nextY,"customLine");
 
 
         GameApp.endSpriteRendering();
