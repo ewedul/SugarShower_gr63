@@ -252,64 +252,102 @@ public class YourGameScreen extends ScalableGameScreen {
     private void spawnIngredients(float delta) {
         spawnTimer += delta;
 
-        //speed depending on phases level1-5 is phase 1, level 5-10 is phase 2, level 10-15 is phase 3
+        // Speed depending on phases
         int ingredientSpeed = 200;
+        if (currentLevel > 5) ingredientSpeed += 100;
+        if (currentLevel > 10) ingredientSpeed += 100;
 
-        if (currentLevel > 5) {
-            ingredientSpeed += 100;
-        }
-        if (currentLevel > 10) {
-            ingredientSpeed += 100;
-        }
+        // Adjust spawn interval by level
+        float adjustedSpawnInterval = spawnInterval - (currentLevel * 0.03f);
+        if (adjustedSpawnInterval < 0.4f) adjustedSpawnInterval = 0.4f;
 
-        //Decrese spawning interval by 0.03 per level.
-        //Add limit to adjust levels not to go too fast.
-        float adjustedSpawnInterval = spawnInterval;
-        adjustedSpawnInterval -= currentLevel * 0.03f;
-
-        if (adjustedSpawnInterval < 0.4f) {
-            adjustedSpawnInterval = 0.4f;
-        }
-
-
-        //Control the diversity of falling objects
+        // ===== NEW: Spawn multiple ingredients at once =====
         if (spawnTimer >= adjustedSpawnInterval) {
-            String randomType;
+            // Determine how many ingredients to spawn based on phase
+            int minIngredientsPerSpawn = 1;
+            int maxIngredientsPerSpawn = 2;
 
-            // 60% chance to spawn needed ingredient, 40% chance random
-            if (random.nextFloat() < 0.6f && !neededIngredients.isEmpty()) {
-                // Spawn a needed ingredient (that hasn't been caught yet)
-                ArrayList<String> stillNeeded = new ArrayList<>(neededIngredients);
-
-                if (!stillNeeded.isEmpty()) {
-                    randomType = stillNeeded.get(random.nextInt(stillNeeded.size()));
-                } else {
-                    randomType = ingredientTypes.get(SaxionApp.getRandomValueBetween(0, ingredientTypes.size()));
-                }
-            } else {
-                // Spawn any random ingredient
-                randomType = ingredientTypes.get(SaxionApp.getRandomValueBetween(0, ingredientTypes.size()));
+            if (currentLevel > 5) {
+                minIngredientsPerSpawn = 2;
+                maxIngredientsPerSpawn = 3;
+            }
+            if (currentLevel > 10) {
+                minIngredientsPerSpawn = 2;
+                maxIngredientsPerSpawn = 4;
             }
 
-            //Prevent too many duplicate items falling at same time
-            if (lastSpawnedType != null) {
-                while (randomType.equals(lastSpawnedType)) {
-                    randomType = ingredientTypes.get(
-                            SaxionApp.getRandomValueBetween(0, ingredientTypes.size())
-                    );
-                }
+            // Spawn random number of ingredients
+            int numToSpawn = random.nextInt(maxIngredientsPerSpawn - minIngredientsPerSpawn + 1)
+                    + minIngredientsPerSpawn;
 
-                lastSpawnedType = randomType;
+            System.out.println("Spawning " + numToSpawn + " ingredients");
+
+            for (int i = 0; i < numToSpawn; i++) {
+                spawnSingleIngredient(ingredientSpeed);
             }
 
-            Ingredient newIngredient = new Ingredient(randomType, ingredientSpeed + random.nextInt(100));
-
-            // Added some boundaries for the ingredients to fall below the banner and with some buffer space to the sides
-            newIngredient.x = random.nextInt(100,(int) getWorldWidth() - (INGREDIENT_SIZE+100));
-            newIngredient.y = getWorldHeight()-200;
-            ingredients.add(newIngredient);
             spawnTimer = 0;
         }
+    }
+
+    /**
+     * Spawn a single ingredient with smart positioning to avoid overlaps
+     */
+    private void spawnSingleIngredient(int baseSpeed) {
+        String randomType;
+
+        // 60% chance to spawn needed ingredient, 40% chance random
+        if (random.nextFloat() < 0.6f && !neededIngredients.isEmpty()) {
+            ArrayList<String> stillNeeded = new ArrayList<>(neededIngredients);
+            if (!stillNeeded.isEmpty()) {
+                randomType = stillNeeded.get(random.nextInt(stillNeeded.size()));
+            } else {
+                randomType = ingredientTypes.get(SaxionApp.getRandomValueBetween(0, ingredientTypes.size()));
+            }
+        } else {
+            randomType = ingredientTypes.get(SaxionApp.getRandomValueBetween(0, ingredientTypes.size()));
+        }
+
+        // Prevent duplicate spawning
+        if (lastSpawnedType != null) {
+            while (randomType.equals(lastSpawnedType)) {
+                randomType = ingredientTypes.get(SaxionApp.getRandomValueBetween(0, ingredientTypes.size()));
+            }
+            lastSpawnedType = randomType;
+        }
+
+        // ===== NEW: Smart positioning to avoid overlaps =====
+        Ingredient newIngredient = new Ingredient(randomType, baseSpeed + random.nextInt(100));
+
+        // Try to find a good spawn position (not too close to existing ingredients)
+        int attempts = 0;
+        boolean positionFound = false;
+
+        while (!positionFound && attempts < 10) {
+            // Random x position with boundaries
+            newIngredient.x = random.nextInt(100, (int) getWorldWidth() - (INGREDIENT_SIZE + 100));
+
+            // Check if too close to existing ingredients
+            boolean tooClose = false;
+            for (Ingredient existing : ingredients) {
+                if (existing.active) {
+                    float distance = Math.abs(existing.x - newIngredient.x);
+                    if (distance < 100) { // Minimum 100px spacing
+                        tooClose = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!tooClose) {
+                positionFound = true;
+            }
+            attempts++;
+        }
+
+        // If no good position found after 10 attempts, use the last random position anyway
+        newIngredient.y = getWorldHeight() - 200;
+        ingredients.add(newIngredient);
     }
 
     private void updateIngredients(float delta) {
@@ -336,54 +374,44 @@ public class YourGameScreen extends ScalableGameScreen {
                 ingredient.active = false;
                 System.out.println("Collected: " + ingredient.type);
 
-                // Check if it's a WRONG ingredient first
+                // Check if WRONG ingredient
                 if (!neededIngredients.contains(ingredient.type)) {
-                    // Handle special ingredients
+                    // Special ingredients handling
                     if (ingredient.type.equals("life") && lives < 3) {
                         lives++;
                     } else if (ingredient.type.contains("rotten")) {
                         lives = lives - 2;
                     } else if (!ingredient.type.equals("life")) {
                         AudioControl.playSound("bad caught", soundVolume);
-                        System.out.println("wrong!!! -1 life");
                         lives--;
                     }
                 } else {
-                    // CORRECT ingredient caught!
+                    // CORRECT ingredient!
                     neededIngredients.remove(ingredient.type);
-                    caughtIngredients.add(ingredient.type); // ← IMPORTANT: Track what was caught
+                    caughtIngredients.add(ingredient.type);
                     AudioControl.playSound("correct caught", soundVolume);
-                    System.out.println("✓ Correct! Still need: " + neededIngredients);
                 }
 
-                // Remove the caught ingredient from the game
+                // ===== NEW: Remove immediately =====
                 ingredients.remove(i);
 
-                // Check if level is complete
+                // Check level complete
                 if (neededIngredients.isEmpty()) {
-                    System.out.println("★★★ LEVEL COMPLETE! ★★★");
-
-                    // Pass recipe data to Level Complete Screen
                     Recipe completedRecipe = recipesArrayList.get(currentLevel - 1);
                     LevelCompleteScreen.setCompletedRecipe(completedRecipe, caughtIngredients);
 
-                    // Advance to next level
                     currentLevel++;
 
-                    // Check if all levels are complete
                     if (currentLevel > recipesArrayList.size()) {
-                        System.out.println("🎉 ALL LEVELS COMPLETE! 🎉");
-                        // TODO: Create a VictoryScreen for final celebration
                         GameApp.switchScreen("MainMenuScreen");
                         return;
                     }
 
-                    // Show Level Complete Screen
                     GameApp.switchScreen("LevelCompleteScreen");
                     return;
                 }
 
-                break; // Only process one collision per frame
+                break; // Only one collision per frame
             }
         }
     }
