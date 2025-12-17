@@ -33,6 +33,7 @@ public class YourGameScreen extends ScalableGameScreen {
     float spawnTimer;
     float spawnInterval = 1.0f;
     String lastSpawnedType = "";
+    Button muteButton = new Button(getWorldWidth() - ((float)1.5*HEART_SIZE),getWorldHeight()-3*HEART_SIZE, 40,40);
 
     //CSV DATA
     static ArrayList<Recipe> recipesArrayList = readCSVRecipes("src/main/resources/recipes.csv");
@@ -95,6 +96,7 @@ public class YourGameScreen extends ScalableGameScreen {
         GameApp.addTexture("life", "textures/life.png");
         GameApp.addTexture("background", "textures/playingbg.png");
         GameApp.addTexture("speech_bubble", "textures/text_bubble.png");
+        GameApp.addTexture("mute-button","textures/buttons/mute-button02.png");
 
         // Hearts textures
         GameApp.addTexture("heart_full", "textures/heart_full.png");
@@ -175,7 +177,7 @@ public class YourGameScreen extends ScalableGameScreen {
 
         // Escape button to exit
         if (GameApp.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            GameApp.quit();
+            GameApp.switchScreen("GameOverScreen"); //quit() method ends the game too abruptly.
         }
 
         if (lives <= 0) {
@@ -184,7 +186,7 @@ public class YourGameScreen extends ScalableGameScreen {
         }
 
         // Mute option
-        if (GameApp.isKeyJustPressed(Input.Keys.M)) {
+        if (GameApp.isKeyJustPressed(Input.Keys.M) || muteButton.isButtonClicked(getMouseX(),getMouseY())) {
             AudioControl.toggleMuteMode();
             GameApp.getMusic("bg-music").setVolume(AudioControl.muteMode ? 0f : bgMusicVolume);
         }
@@ -204,6 +206,10 @@ public class YourGameScreen extends ScalableGameScreen {
 
         //Draw bowl
         GameApp.drawTexture("bowl", bowl.x, bowl.y, BOWL_WIDTH, BOWL_HEIGHT);
+
+        //Draw mute button
+        GameApp.drawTexture("mute-button",getWorldWidth() - ((float)1.5*HEART_SIZE),getWorldHeight()-3*HEART_SIZE, 40,40);
+
 
         //Draw falling ingredients
         for (Ingredient ingredient : ingredients) {
@@ -551,6 +557,7 @@ public class YourGameScreen extends ScalableGameScreen {
         GameApp.disposeTexture("life");
         GameApp.disposeTexture("heart_full");
         GameApp.disposeTexture("heart_empty");
+        GameApp.disposeTexture("mute-button");
 
         // Dispose all customer textures
         for (int i = 0; i < totalCustomers; i++) {
