@@ -56,11 +56,6 @@ public class YourGameScreen extends ScalableGameScreen {
     @Override
     public void show() {
 
-        // Keeps track of the level
-        //currentLevel = 1;
-
-//        neededIngredients = new ArrayList<>(
-//                recipesArrayList.get(currentLevel - 1).recipeIngredientList);
         setLevel(currentLevel);
 
         // clear ing for the new level
@@ -70,7 +65,7 @@ public class YourGameScreen extends ScalableGameScreen {
         //Pop-up setup.
         memorizeMode = true;
         memorizeTime = 3f;
-        GameApp.addTexture("popup_gui", "textures/recipe_popup.png");
+        GameApp.addTexture("popup_gui", "textures/popupscreen.png");
 
         //BOWL
         bowl = new Bowl();
@@ -95,6 +90,16 @@ public class YourGameScreen extends ScalableGameScreen {
         GameApp.addTexture("speech_bubble", "textures/speech_bubble.png");
         GameApp.addFont("roboto", "fonts/Roboto_SemiBold.ttf", 20);
 
+        // Load CUSTOM background for level complete screen
+        GameApp.addTexture("levelcomplete_bg", "textures/levelcomplete_bg.png");
+        // Load custom color
+        GameApp.addColor("customLine", 64, 15, 38);
+        // Load fonts - INCLUDING BUBBLE FONT
+        GameApp.addFont("bubble", "fonts/bubble.ttf", 40);      // Big bubble font for title
+        GameApp.addFont("bubble_small", "fonts/bubble.ttf", 25); // Smaller bubble for subtitle
+        GameApp.addFont("bubble_lists", "fonts/bubble.ttf", 15); // for ing name
+        GameApp.addFont("bubble_count", "fonts/bubble.ttf", 12); // for count
+
         // Load all ingredient images using helper method
         for (String ingredientName : ingredientTypes) {
             String texturePath = getTexturePath(ingredientName);
@@ -114,7 +119,6 @@ public class YourGameScreen extends ScalableGameScreen {
 
         //Play background music
         AudioControl.playMusic("bg-music", true, bgMusicVolume);
-
 
     }
 
@@ -166,11 +170,10 @@ public class YourGameScreen extends ScalableGameScreen {
 
         //Draw bowl
         GameApp.drawTexture("bowl", bowl.x, bowl.y, BOWL_SIZE, BOWL_SIZE);
-        //GameApp.drawText("roboto", "lives: " + lives, 30, getWorldHeight() - 50, "black");
 
 
         //Draw banner in the centre
-        GameApp.drawTexture("banner", getWorldWidth() / 7, getWorldHeight()-180, 600, 200);
+        GameApp.drawTexture("banner", getWorldWidth() / 7, getWorldHeight() - 180, 600, 200);
 
 
         for (Recipe recipe : recipesArrayList) {
@@ -194,7 +197,7 @@ public class YourGameScreen extends ScalableGameScreen {
         //Draw information of current level and the level recipe
         GameApp.drawText("roboto", "Level:" + recipesArrayList.get(currentLevel - 1).level + " - " + recipesArrayList.get(currentLevel - 1).name, getWorldWidth() / (float) 2.6, getWorldHeight() - 70, "black");
         //GameApp.drawText("roboto", "Recipe to make: " + recipesArrayList.get(currentLevel - 1).name, 30, getWorldHeight() - 150, "black");
-        GameApp.drawText("roboto", "Ingredients needed to make: " + neededIngredients.toString(), 30, getWorldHeight() - 200, "black");
+        GameApp.drawText("roboto", "Ingredients needed to make: " + neededIngredients.toString(), 30, getWorldHeight() - 250, "black");
 
 
         GameApp.endSpriteRendering();
@@ -202,28 +205,61 @@ public class YourGameScreen extends ScalableGameScreen {
     }
 
     private void drawRecipePopup() {
-        float popupW = 600;
-        float popupH = 400;
+        float popupW = getWorldWidth();
+        float popupH = getWorldHeight();
         float popupX = getWorldWidth() / 2 - popupW / 2;
         float popupY = getWorldHeight() / 2 - popupH / 2;
 
+        //Booklet texture
         GameApp.drawTexture("popup_gui", popupX, popupY, popupW, popupH);
+        GameApp.drawText("bubble", "Memorize this recipe! ", popupW / 9, popupH - 100, "customLine");
 
-        GameApp.drawTextHorizontallyCentered("roboto", "MEMORIZE THIS RECIPE!",
-                getWorldWidth() / 2, popupY + popupH - 40, "black");
+        // Counter texture inside speech bubble
+        GameApp.drawTexture("speech_bubble", popupW / 15, popupH - 220, 100, 100);
+        GameApp.drawText("bubble", String.valueOf((int) memorizeTime), (popupW / 9), popupH - 190, "customLine");
 
-        GameApp.drawTextHorizontallyCentered("roboto",
-                recipesArrayList.get(currentLevel - 1).name,
-                getWorldWidth() / 2, popupY + popupH - 90, "black");
+        // Name of the current recipe texture
+        GameApp.drawText("bubble_small", recipesArrayList.get(currentLevel - 1).name.replace("_", " "),
+                80, 550, "customLine");
 
-        float textX = popupX + 40;
-        float textY = popupY + popupH - 140;
+        // ===== LAYOUT =====
+        // Left side: Big finished product picture
+        float bigPicX = 81;
+        float bigPicY = 285;
 
-        for (String ing : neededIngredients) {
-            GameApp.drawText("roboto", " - " + ing.replace("_", " "), textX + 150, textY, "black");
-            textY -= 30;
+        // Right side: Ingredient list
+        float listX = 450;
+        float listY = getWorldHeight() - 305;
+        float ingredientSize = 60;
+        float rowHeight = 75;
+
+        // Draw big finished product picture
+        GameApp.drawTexture(recipesArrayList.get(currentLevel - 1).name, bigPicX, bigPicY, 254, 232);
+
+        float currentX = listX;
+        float currentY = listY;
+
+
+        int ingredientCounter = 0;
+        for (String ingredient : recipesArrayList.get(currentLevel - 1).recipeIngredientList) {
+
+            // Draw ingredient icon (small)
+            GameApp.drawTexture(ingredient, currentX-15, currentY - 20, ingredientSize, ingredientSize);
+
+            // Draw ingredient name
+            String ingredientText = ingredient.replace("_", " ");
+            GameApp.drawText("bubble_lists", 1 + "X " + ingredientText, currentX,
+                    currentY + 40, "customLine");
+
+            ingredientCounter++;
+
+            // Shift ingredient list X position if recipe longer than 4 so it fits on the booklet texture
+            if (ingredientCounter == 4) {
+                currentX += 150;
+                currentY = listY + ingredientSize;
+            }
+            currentY -= rowHeight; // Move down for next ingredient
         }
-
 
     }
 
@@ -246,7 +282,7 @@ public class YourGameScreen extends ScalableGameScreen {
 
         bowl.y = GameApp.clamp(bowl.y, 0, getWorldHeight() - BOWL_SIZE);
         // Added some boundary space where the bowl can't go (100 each side)
-        bowl.x = GameApp.clamp(bowl.x, 100, getWorldWidth() - (BOWL_SIZE+100));
+        bowl.x = GameApp.clamp(bowl.x, 0, getWorldWidth() - (BOWL_SIZE));
     }
 
     private void spawnIngredients(float delta) {
@@ -535,11 +571,11 @@ public class YourGameScreen extends ScalableGameScreen {
     public static void drawRecipes(int currentLevel) {
 
         //Draw bubble with image of finished product (ordered item)
-        GameApp.drawTexture("speech_bubble", GameApp.getWorldWidth()-150, GameApp.getWorldHeight()-200, BOWL_SIZE + 50, BOWL_SIZE + 50);
+        GameApp.drawTexture("speech_bubble", 50, GameApp.getWorldHeight() - 150, BOWL_SIZE + 50, BOWL_SIZE + 30);
         //Draw a customer
-        GameApp.drawTexture("customer_1", GameApp.getWorldWidth()-100, GameApp.getWorldHeight()-260, BOWL_SIZE , BOWL_SIZE );
+        GameApp.drawTexture("customer_1", 10, GameApp.getWorldHeight() - 240, BOWL_SIZE, BOWL_SIZE);
 
-        GameApp.drawTexture(recipesArrayList.get(currentLevel - 1).name, GameApp.getWorldWidth()-120, GameApp.getWorldHeight()-170, INGREDIENT_SIZE, INGREDIENT_SIZE);
+        GameApp.drawTexture(recipesArrayList.get(currentLevel - 1).name, 70, GameApp.getWorldHeight() - 130, INGREDIENT_SIZE, INGREDIENT_SIZE);
 
 
     }
