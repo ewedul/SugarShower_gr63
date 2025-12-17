@@ -26,6 +26,7 @@ public class YourGameScreen extends ScalableGameScreen {
 
     //UI SCALING CONSTANTS (adjust these to get the right size)
     public static final float HEART_SIZE = 50f;         // Original: 200x170 → scale to 40x34
+    public static final float QUESTION_MARK_SIZE = 40f;
     public static final float BUBBLE_WIDTH = 120f;      // Original: 340x300 → scale to 150x132
     public static final float BUBBLE_HEIGHT = 102f;
     public static final float CUSTOMER_SIZE = 150f;     // Make customer bigger
@@ -100,6 +101,10 @@ public class YourGameScreen extends ScalableGameScreen {
         // Hearts textures
         GameApp.addTexture("heart_full", "textures/heart_full.png");
         GameApp.addTexture("heart_empty", "textures/heart_empty.png");
+
+        // Questionmark textures
+        GameApp.addTexture("question_mark", "textures/questionmark.png");
+
 
         // Load all customer textures
         for (int i = 0; i < totalCustomers; i++) {
@@ -219,8 +224,9 @@ public class YourGameScreen extends ScalableGameScreen {
         }
 
         //just for debugging - get rid of later
-        GameApp.drawTextHorizontallyCentered("bubble_count", String.valueOf(neededIngredients),
-                300, 500, "customLine");
+//        GameApp.drawTextHorizontallyCentered("bubble_count", String.valueOf(neededIngredients),
+//                300, 500, "customLine");
+
 
         // ===== NEW UI LAYOUT =====
         // Draw all top UI elements
@@ -244,6 +250,7 @@ public class YourGameScreen extends ScalableGameScreen {
 
         // ===== TOP RIGHT: Hearts (Lives) =====
         drawLivesHearts(lives);
+        drawProgress(recipesArrayList, caughtIngredients);
     }
 
     /**
@@ -578,6 +585,8 @@ public class YourGameScreen extends ScalableGameScreen {
         GameApp.disposeTexture("life");
         GameApp.disposeTexture("heart_full");
         GameApp.disposeTexture("heart_empty");
+        GameApp.disposeTexture("question_mark");
+
 
         // Dispose all customer textures
         for (int i = 0; i < totalCustomers; i++) {
@@ -657,4 +666,25 @@ public class YourGameScreen extends ScalableGameScreen {
         lives = 3;
         System.out.println("set: current level: " + currentLevel);
     }
+
+    // Draw progress bar for caught ingredients
+    private void drawProgress(ArrayList<Recipe> recipesArrayList, ArrayList<String> caughtIngredients) {
+        float spacing = 10;
+        int length = recipesArrayList.get(currentLevel - 1).recipeIngredientList.size();
+        float startX = getWorldWidth() - QUESTION_MARK_SIZE - 20;
+        float progressY = getWorldHeight() - QUESTION_MARK_SIZE * 3; // 20px padding from top
+
+        for (int i = 0; i < length; i++) {
+            float progressX = startX - (i * (QUESTION_MARK_SIZE + spacing));
+
+            //Draw question marks if caught ingredients list is empty, draw ingredient otherwise
+            if (i < caughtIngredients.size()) {
+                GameApp.drawTexture(caughtIngredients.get(i), progressX, progressY, QUESTION_MARK_SIZE, QUESTION_MARK_SIZE * 0.85f);
+            } else {
+                GameApp.drawTexture("question_mark", progressX, progressY, QUESTION_MARK_SIZE, QUESTION_MARK_SIZE * 0.85f);
+            }
+        }
+    }
+
+
 }

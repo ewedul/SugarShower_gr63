@@ -14,6 +14,7 @@ public class LevelCompleteScreen extends ScalableGameScreen {
     // Recipe information passed from game screen
     private static Recipe completedRecipe;
     private static ArrayList<String> ingredientsCaught;
+    public static final float soundVolume = 0.8f;
 
     // Track ingredient counts (how many times each was caught)
     private HashMap<String, Integer> ingredientCounts;
@@ -50,6 +51,11 @@ public class LevelCompleteScreen extends ScalableGameScreen {
         GameApp.addFont("bubble_count", "fonts/bubble.ttf", 12); // for count
         GameApp.addFont("roboto", "fonts/Roboto_SemiBold.ttf", 20); // For ingredient list
 
+
+        // Load a sound
+        GameApp.addSound("correct caught", "audio/correct caught.ogg");
+
+
         // Load the finished product image using recipe name
         String finishedProductPath = getFinishedProductPath(completedRecipe.name);
         GameApp.addTexture("finished_product", finishedProductPath);
@@ -78,11 +84,15 @@ public class LevelCompleteScreen extends ScalableGameScreen {
         }
 
         System.out.println("Ingredient counts: " + ingredientCounts);
+
+        // A correct caught sound because otherwise it was silent lol
+        GameApp.playSound("correct caught");
     }
 
     @Override
     public void render(float delta) {
         super.render(delta);
+
 
         // Coordinate of "NEXT" button at bottom right
         float buttonWidth = 150;
@@ -136,6 +146,8 @@ public class LevelCompleteScreen extends ScalableGameScreen {
         // Draw ingredient list on the right side
         float currentY = listY;
 
+
+
         // Use a set to track already displayed ingredients (avoid duplicates in display)
         ArrayList<String> displayedIngredients = new ArrayList<>();
 
@@ -178,16 +190,20 @@ public class LevelCompleteScreen extends ScalableGameScreen {
         GameApp.drawText("bubble_small","NEXT", nextX, nextY,"customLine");
 
 
+
         GameApp.endSpriteRendering();
     }
 
     @Override
     public void hide() {
         // Clean up textures
+        GameApp.stopAllAudio();
+
         GameApp.disposeTexture("levelcomplete_bg"); // Dispose custom background
         GameApp.disposeTexture("next_button_normal");
         GameApp.disposeTexture("next_button_selected");
         GameApp.disposeTexture("finished_product");
+        GameApp.disposeSound("correct caught");
 
         // Clean up fonts
         GameApp.disposeFont("bubble");
