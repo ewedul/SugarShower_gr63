@@ -1,8 +1,6 @@
 package nl.saxion.game.sugarshower;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.audio.Music;
 import nl.saxion.gameapp.GameApp;
 import nl.saxion.gameapp.screens.ScalableGameScreen;
 import nl.saxion.app.CsvReader;
@@ -14,18 +12,26 @@ import java.util.Random;
 public class YourGameScreen extends ScalableGameScreen {
 
     //GAME SETTINGS
-    public static final int BOWL_SIZE = 75;
+    public static final int BOWL_HEIGHT = 125;
+    public static final int BOWL_WIDTH = 95;
     public static final int BOWL_SPEED = 600;
     public static final int INGREDIENT_SIZE = 80;
     public static final float bgMusicVolume = 0.5f;
     public static final float soundVolume = 0.8f;
+
+    //UI SCALING CONSTANTS (adjust these to get the right size)
+    public static final float HEART_SIZE = 50f;         // Original: 200x170 → scale to 40x34
+    public static final float BUBBLE_WIDTH = 120f;      // Original: 340x300 → scale to 150x132
+    public static final float BUBBLE_HEIGHT = 102f;
+    public static final float CUSTOMER_SIZE = 150f;     // Make customer bigger
+    public static final float ORDER_SIZE = 105f;         // Finished product in bubble
 
     //GAME OBJECTS
     Bowl bowl;
     ArrayList<Ingredient> ingredients;
     Random random;
     float spawnTimer;
-    float spawnInterval = 1.0f; // -- Spawn every 1 second
+    float spawnInterval = 1.0f;
     String lastSpawnedType = "";
 
     //CSV DATA
@@ -49,6 +55,11 @@ public class YourGameScreen extends ScalableGameScreen {
     boolean memorizeMode = true;
     float memorizeTime = 3f;
 
+    // CUSTOMER SYSTEM
+    private int currentCustomer = 0;
+    private int previousCustomer = -1;
+    private int totalCustomers = 8; // Adjust based on how many customer images you have
+
     public YourGameScreen() {
         super(800, 800);
     }
@@ -61,16 +72,15 @@ public class YourGameScreen extends ScalableGameScreen {
         // clear ing for the new level
         caughtIngredients.clear();
 
-
-        //Pop-up setup.
+        //Pop-up setup
         memorizeMode = true;
         memorizeTime = 3f;
         GameApp.addTexture("popup_gui", "textures/popupscreen.png");
 
         //BOWL
         bowl = new Bowl();
-        bowl.x = getWorldWidth() / 2 - (float) BOWL_SIZE / 2;
-        bowl.y = 50; // Position bowl at the bottom
+        bowl.x = getWorldWidth() / 2 - (float) BOWL_HEIGHT / 2;
+        bowl.y = 15;
 
         //INGREDIENT SYSTEM
         ingredients = new ArrayList<>();
@@ -81,32 +91,44 @@ public class YourGameScreen extends ScalableGameScreen {
         //ArrayList<Recipe> recipesArrayList = readCSVRecipes("src/main/resources/recipes.csv");
 
         // TEXTURES
-        GameApp.addTexture("bowl", "textures/bowl_03.png");
-        GameApp.addTexture("banner", "textures/banner.png");
-        GameApp.addTexture("customer_1", "textures/customer_1.png");
-
+        GameApp.addTexture("bowl", "textures/bowl.png");
         GameApp.addTexture("life", "textures/life.png");
-        GameApp.addTexture("background", "textures/pink-bg.png");
-        GameApp.addTexture("speech_bubble", "textures/speech_bubble.png");
-        GameApp.addFont("roboto", "fonts/Roboto_SemiBold.ttf", 20);
+        GameApp.addTexture("background", "textures/playingbg.png");
+        GameApp.addTexture("speech_bubble", "textures/text_bubble.png");
 
-        // Load CUSTOM background for level complete screen
-        GameApp.addTexture("levelcomplete_bg", "textures/levelcomplete_bg.png");
-        // Load custom color
+        // Hearts textures
+        GameApp.addTexture("heart_full", "textures/heart_full.png");
+        GameApp.addTexture("heart_empty", "textures/heart_empty.png");
+
+        // Load all customer textures
+        for (int i = 0; i < totalCustomers; i++) {
+            GameApp.addTexture("customer_" + i, "textures/customers/customer_" + i + ".png");
+        }
+
+        // Select random customer for this level
+        selectRandomCustomer();
+
+        // Fonts
+        GameApp.addFont("roboto", "fonts/Roboto_SemiBold.ttf", 20);
+        GameApp.addFont("bubble", "fonts/bubble.ttf", 40);
+        GameApp.addFont("bubble_small", "fonts/bubble.ttf", 25);
+        GameApp.addFont("bubble_lists", "fonts/bubble.ttf", 15);
+        GameApp.addFont("bubble_count", "fonts/bubble.ttf", 12);
         GameApp.addColor("customLine", 64, 15, 38);
+
         // Load fonts - INCLUDING BUBBLE FONT
         GameApp.addFont("bubble", "fonts/bubble.ttf", 40);      // Big bubble font for title
         GameApp.addFont("bubble_small", "fonts/bubble.ttf", 25); // Smaller bubble for subtitle
         GameApp.addFont("bubble_lists", "fonts/bubble.ttf", 15); // for ing name
         GameApp.addFont("bubble_count", "fonts/bubble.ttf", 12); // for count
 
-        // Load all ingredient images using helper method
+        // Load all ingredient images
         for (String ingredientName : ingredientTypes) {
             String texturePath = getTexturePath(ingredientName);
             GameApp.addTexture(ingredientName, texturePath);
         }
 
-        //Load the images of all finished products
+        //Load finished products
         for (Recipe recipe : recipesArrayList) {
             String texturePath = "textures/finished_products/" + recipe.name + ".png";
             GameApp.addTexture(recipe.name, texturePath);
@@ -119,7 +141,19 @@ public class YourGameScreen extends ScalableGameScreen {
 
         //Play background music
         AudioControl.playMusic("bg-music", true, bgMusicVolume);
+    }
 
+    /**
+     * Select a random customer that's different from the previous one
+     */
+    private void selectRandomCustomer() {
+        int newCustomer;
+        do {
+            newCustomer = random.nextInt(totalCustomers);
+        } while (newCustomer == previousCustomer && totalCustomers > 1);
+
+        previousCustomer = currentCustomer;
+        currentCustomer = newCustomer;
     }
 
     @Override
@@ -169,39 +203,106 @@ public class YourGameScreen extends ScalableGameScreen {
         }
 
         //Draw bowl
-        GameApp.drawTexture("bowl", bowl.x, bowl.y, BOWL_SIZE, BOWL_SIZE);
+        GameApp.drawTexture("bowl", bowl.x, bowl.y, BOWL_WIDTH, BOWL_HEIGHT);
 
-
-        //Draw banner in the centre
-        GameApp.drawTexture("banner", getWorldWidth() / 7, getWorldHeight() - 180, 600, 200);
-
-
-        for (Recipe recipe : recipesArrayList) {
-            if (recipe.level == currentLevel) {
-                drawRecipes(currentLevel);
-            }
-        }
-        //drawRecipes(currentLevel);
-
-
-        //Draw images of falling items in their coordinates
+        //Draw falling ingredients
         for (Ingredient ingredient : ingredients) {
             if (ingredient.active) {
-                GameApp.drawTexture(ingredient.type, ingredient.x, ingredient.y, INGREDIENT_SIZE, INGREDIENT_SIZE);
+                GameApp.drawTexture(ingredient.type, ingredient.x, ingredient.y,
+                        INGREDIENT_SIZE, INGREDIENT_SIZE);
             }
         }
 
-        //Draw hearts to visualize player's lives
-        drawLivesHearts(lives);
-
-        //Draw information of current level and the level recipe
-        GameApp.drawText("roboto", "Level:" + recipesArrayList.get(currentLevel - 1).level + " - " + recipesArrayList.get(currentLevel - 1).name, getWorldWidth() / (float) 2.6, getWorldHeight() - 70, "black");
-        //GameApp.drawText("roboto", "Recipe to make: " + recipesArrayList.get(currentLevel - 1).name, 30, getWorldHeight() - 150, "black");
-        GameApp.drawText("roboto", "Ingredients needed to make: " + neededIngredients.toString(), 30, getWorldHeight() - 250, "black");
-
+        // ===== NEW UI LAYOUT =====
+        drawTopUI(); // Draw all top UI elements
 
         GameApp.endSpriteRendering();
+    }
 
+    /**
+     * Draw all UI elements at the top of the screen
+     */
+    private void drawTopUI() {
+        // ===== TOP LEFT: Customer + Speech Bubble + Order =====
+        drawCustomerWithOrder();
+
+        // ===== TOP CENTER: Current Level =====
+        drawLevelInfo();
+
+        // ===== TOP RIGHT: Hearts (Lives) =====
+        drawLivesHearts(lives);
+    }
+
+    /**
+     * Draw customer face with speech bubble and order image
+     * Position: Top Left Corner
+     */
+    private void drawCustomerWithOrder() {
+        float customerX = 0;
+        float customerY = getWorldHeight() - CUSTOMER_SIZE;
+
+        float bubbleX = customerX + CUSTOMER_SIZE ; // Next to customer
+        float bubbleY = getWorldHeight() - BUBBLE_HEIGHT - 20;
+
+        // Calculate center of bubble for the order
+        float orderX = (bubbleX + (BUBBLE_WIDTH - ORDER_SIZE) / 2) + 4;
+        float orderY = bubbleY + (BUBBLE_HEIGHT - ORDER_SIZE) / 2;
+
+        // Draw customer face (bigger)
+        String customerTexture = "customer_" + currentCustomer;
+        GameApp.drawTexture(customerTexture, customerX, customerY, CUSTOMER_SIZE, CUSTOMER_SIZE);
+
+        // Draw speech bubble (scaled down)
+        GameApp.drawTexture("speech_bubble", bubbleX, bubbleY, BUBBLE_WIDTH, BUBBLE_HEIGHT);
+
+        // Draw order (finished product) centered in bubble
+        String orderTexture = recipesArrayList.get(currentLevel - 1).name;
+        GameApp.drawTexture(orderTexture, orderX, orderY, ORDER_SIZE, ORDER_SIZE);
+    }
+
+    /**
+     * Draw current level number and recipe name
+     * Position: Top Center
+     */
+    private void drawLevelInfo() {
+        float centerX = getWorldWidth() / 2;
+        float textY = getWorldHeight() - 30;
+
+        // Level number
+        String levelText = "Lv." + currentLevel;
+        GameApp.drawTextHorizontallyCentered("bubble_small", levelText,
+                centerX, textY, "customLine");
+
+        // Recipe name below level
+        String recipeName = recipesArrayList.get(currentLevel - 1).name.replace("_", " ");
+        GameApp.drawTextHorizontallyCentered("roboto", recipeName,
+                centerX, textY - 30, "customLine");
+    }
+
+    /**
+     * Draw hearts showing current lives
+     * Position: Top Right Corner
+     * Shows full hearts for remaining lives, empty hearts for lost lives
+     */
+    private void drawLivesHearts(int lives) {
+        int maxLives = 3;
+        float spacing = 10;
+
+        // Calculate total width of hearts to center them in top right
+        float totalWidth = (HEART_SIZE * maxLives) + (spacing * (maxLives - 1));
+        float startX = getWorldWidth() - totalWidth - 20; // 20px padding from right edge
+        float heartY = getWorldHeight() - HEART_SIZE - 20; // 20px padding from top
+
+        for (int i = 0; i < maxLives; i++) {
+            float heartX = startX + (i * (HEART_SIZE + spacing));
+
+            // Draw full heart if player still has this life, empty heart otherwise
+            if (i < lives) {
+                GameApp.drawTexture("heart_full", heartX, heartY, HEART_SIZE, HEART_SIZE * 0.85f);
+            } else {
+                GameApp.drawTexture("heart_empty", heartX, heartY, HEART_SIZE, HEART_SIZE * 0.85f);
+            }
+        }
     }
 
     private void drawRecipePopup() {
@@ -214,8 +315,10 @@ public class YourGameScreen extends ScalableGameScreen {
         GameApp.drawTexture("popup_gui", popupX, popupY, popupW, popupH);
         GameApp.drawText("bubble", "Memorize this recipe! ", popupW / 9, popupH - 100, "customLine");
 
-        // Counter texture inside speech bubble
-        GameApp.drawTexture("speech_bubble", popupW / 15, popupH - 220, 100, 100);
+        // Counter texture inside speech bubble - use scaled bubble
+        float counterBubbleX = popupW / 15;
+        float counterBubbleY = popupH - 220;
+        GameApp.drawTexture("speech_bubble", counterBubbleX, counterBubbleY, 100, 88); // Scaled: 100x88
         GameApp.drawText("bubble", String.valueOf((int) memorizeTime), (popupW / 9), popupH - 190, "customLine");
 
         // Name of the current recipe texture
@@ -239,10 +342,8 @@ public class YourGameScreen extends ScalableGameScreen {
         float currentX = listX;
         float currentY = listY;
 
-
         int ingredientCounter = 0;
         for (String ingredient : recipesArrayList.get(currentLevel - 1).recipeIngredientList) {
-
             // Draw ingredient icon (small)
             GameApp.drawTexture(ingredient, currentX-15, currentY - 20, ingredientSize, ingredientSize);
 
@@ -258,9 +359,8 @@ public class YourGameScreen extends ScalableGameScreen {
                 currentX += 150;
                 currentY = listY + ingredientSize;
             }
-            currentY -= rowHeight; // Move down for next ingredient
+            currentY -= rowHeight;
         }
-
     }
 
     private void popUpRecipeTimer(float delta) {
@@ -275,14 +375,12 @@ public class YourGameScreen extends ScalableGameScreen {
     public void handlePlayerInput(float delta) {
         if (GameApp.isKeyPressed(Input.Keys.LEFT)) {
             bowl.x = bowl.x - BOWL_SPEED * delta;
-
         } else if (GameApp.isKeyPressed(Input.Keys.RIGHT)) {
             bowl.x = bowl.x + BOWL_SPEED * delta;
         }
 
-        bowl.y = GameApp.clamp(bowl.y, 0, getWorldHeight() - BOWL_SIZE);
-        // Added some boundary space where the bowl can't go (100 each side)
-        bowl.x = GameApp.clamp(bowl.x, 0, getWorldWidth() - (BOWL_SIZE));
+        bowl.y = GameApp.clamp(bowl.y, 0, getWorldHeight() - BOWL_WIDTH);
+        bowl.x = GameApp.clamp(bowl.x, 0, getWorldWidth() - (BOWL_HEIGHT));
     }
 
     private void spawnIngredients(float delta) {
@@ -312,7 +410,6 @@ public class YourGameScreen extends ScalableGameScreen {
                 maxIngredientsPerSpawn = 4;
             }
 
-            // Spawn random number of ingredients
             int numToSpawn = random.nextInt(maxIngredientsPerSpawn - minIngredientsPerSpawn + 1)
                     + minIngredientsPerSpawn;
 
@@ -326,13 +423,9 @@ public class YourGameScreen extends ScalableGameScreen {
         }
     }
 
-    /**
-     * Spawn a single ingredient with smart positioning to avoid overlaps
-     */
     private void spawnSingleIngredient(int baseSpeed) {
         String randomType;
 
-        // 60% chance to spawn needed ingredient, 40% chance random
         if (random.nextFloat() < 0.6f && !neededIngredients.isEmpty()) {
             ArrayList<String> stillNeeded = new ArrayList<>(neededIngredients);
             if (!stillNeeded.isEmpty()) {
@@ -344,7 +437,6 @@ public class YourGameScreen extends ScalableGameScreen {
             randomType = ingredientTypes.get(SaxionApp.getRandomValueBetween(0, ingredientTypes.size()));
         }
 
-        // Prevent duplicate spawning
         if (lastSpawnedType != null) {
             while (randomType.equals(lastSpawnedType)) {
                 randomType = ingredientTypes.get(SaxionApp.getRandomValueBetween(0, ingredientTypes.size()));
@@ -352,23 +444,19 @@ public class YourGameScreen extends ScalableGameScreen {
             lastSpawnedType = randomType;
         }
 
-        // ===== NEW: Smart positioning to avoid overlaps =====
         Ingredient newIngredient = new Ingredient(randomType, baseSpeed + random.nextInt(100));
 
-        // Try to find a good spawn position (not too close to existing ingredients)
         int attempts = 0;
         boolean positionFound = false;
 
         while (!positionFound && attempts < 10) {
-            // Random x position with boundaries
             newIngredient.x = random.nextInt(100, (int) getWorldWidth() - (INGREDIENT_SIZE + 100));
 
-            // Check if too close to existing ingredients
             boolean tooClose = false;
             for (Ingredient existing : ingredients) {
                 if (existing.active) {
                     float distance = Math.abs(existing.x - newIngredient.x);
-                    if (distance < 100) { // Minimum 100px spacing
+                    if (distance < 100) {
                         tooClose = true;
                         break;
                     }
@@ -381,20 +469,17 @@ public class YourGameScreen extends ScalableGameScreen {
             attempts++;
         }
 
-        // If no good position found after 10 attempts, use the last random position anyway
         newIngredient.y = getWorldHeight() - 200;
         ingredients.add(newIngredient);
     }
 
     private void updateIngredients(float delta) {
-        // Update position of all active ingredients
         for (int i = ingredients.size() - 1; i >= 0; i--) {
             Ingredient ingredient = ingredients.get(i);
 
             if (ingredient.active) {
                 ingredient.y -= ingredient.speed * delta;
 
-                // Remove ingredients that fall off the bottom of the screen
                 if (ingredient.y < -INGREDIENT_SIZE) {
                     ingredients.remove(i);
                 }
@@ -410,9 +495,7 @@ public class YourGameScreen extends ScalableGameScreen {
                 ingredient.active = false;
                 System.out.println("Collected: " + ingredient.type);
 
-                // Check if WRONG ingredient
                 if (!neededIngredients.contains(ingredient.type)) {
-                    // Special ingredients handling
                     if (ingredient.type.equals("life") && lives < 3) {
                         lives++;
                     } else if (ingredient.type.contains("rotten")) {
@@ -422,21 +505,21 @@ public class YourGameScreen extends ScalableGameScreen {
                         lives--;
                     }
                 } else {
-                    // CORRECT ingredient!
                     neededIngredients.remove(ingredient.type);
                     caughtIngredients.add(ingredient.type);
                     AudioControl.playSound("correct caught", soundVolume);
                 }
 
-                // ===== NEW: Remove immediately =====
                 ingredients.remove(i);
 
-                // Check level complete
                 if (neededIngredients.isEmpty()) {
                     Recipe completedRecipe = recipesArrayList.get(currentLevel - 1);
                     LevelCompleteScreen.setCompletedRecipe(completedRecipe, caughtIngredients);
 
                     currentLevel++;
+
+                    // Select new customer for next level
+                    selectRandomCustomer();
 
                     if (currentLevel > recipesArrayList.size()) {
                         GameApp.switchScreen("MainMenuScreen");
@@ -447,55 +530,55 @@ public class YourGameScreen extends ScalableGameScreen {
                     return;
                 }
 
-                break; // Only one collision per frame
+                break;
             }
         }
     }
 
     private boolean isColliding(Ingredient ingredient, Bowl bowl) {
-        return ingredient.x < bowl.x + BOWL_SIZE &&
+        return ingredient.x < bowl.x + BOWL_WIDTH &&
                 ingredient.x + INGREDIENT_SIZE > bowl.x &&
-                ingredient.y < bowl.y + BOWL_SIZE &&
+                ingredient.y < bowl.y + BOWL_WIDTH &&
                 ingredient.y + INGREDIENT_SIZE > bowl.y;
     }
 
-
     @Override
     public void hide() {
-        //clean up textures
         GameApp.disposeTexture("bowl");
         GameApp.disposeTexture("background");
-        GameApp.disposeTexture("roboto");
+        GameApp.disposeTexture("popup_gui");
         GameApp.disposeTexture("speech_bubble");
         GameApp.disposeTexture("life");
-        GameApp.disposeTexture("banner");
-        GameApp.disposeTexture("customer_1");
-        //clean up audio
+        GameApp.disposeTexture("heart_full");
+        GameApp.disposeTexture("heart_empty");
+
+        // Dispose all customer textures
+        for (int i = 0; i < totalCustomers; i++) {
+            GameApp.disposeTexture("customer_" + i);
+        }
+
+        GameApp.disposeFont("roboto");
+        GameApp.disposeFont("bubble");
+        GameApp.disposeFont("bubble_small");
+        GameApp.disposeFont("bubble_lists");
+        GameApp.disposeFont("bubble_count");
+
         GameApp.disposeMusic("bg-music");
         GameApp.disposeSound("correct caught");
         GameApp.disposeSound("bad caught");
 
-
-        // Clean up ingredient textures
         for (String type : ingredientTypes) {
             GameApp.disposeTexture(type);
-        }
-
-        for (Recipe recipe : recipesArrayList) {
-            if (recipe.level != currentLevel) {
-                GameApp.disposeTexture(recipe.name);
-            }
         }
 
         for (Recipe recipe : recipesArrayList) {
             GameApp.disposeTexture(recipe.name);
         }
 
-
         ingredients.clear();
     }
 
-    // Read the ingredients.csv into an arraylist
+    // CSV methods remain the same...
     public ArrayList<String> readCSVIngredients(String filename) {
         ArrayList<String> ingredients = new ArrayList<>();
         CsvReader reader = new CsvReader(filename);
@@ -507,14 +590,10 @@ public class YourGameScreen extends ScalableGameScreen {
         return ingredients;
     }
 
-    // helper method
     public String getTexturePath(String ingredientName) {
-
         return "textures/ingredients/" + ingredientName + ".png";
     }
 
-
-    // Read the recipes.csv into an arraylist of Recipes
     public static ArrayList<Recipe> readCSVRecipes(String filename) {
         ArrayList<Recipe> recipes = new ArrayList<>();
         CsvReader reader = new CsvReader(filename);
@@ -535,9 +614,7 @@ public class YourGameScreen extends ScalableGameScreen {
             newRecipe.recipeIngredientList.add(reader.getString(9));
             newRecipe.recipeIngredientList.add(reader.getString(10));
 
-            //remove the ingredients called NULL
             newRecipe.recipeIngredientList.removeIf(ingredient -> ingredient.equals("NULL"));
-
             recipes.add(newRecipe);
         }
         return recipes;
@@ -547,41 +624,10 @@ public class YourGameScreen extends ScalableGameScreen {
         return currentLevel;
     }
 
-
     public static void setLevel(int currentLevel) {
         ArrayList<String> neededIngredientsTemp = new ArrayList<>(recipesArrayList.get(currentLevel - 1).recipeIngredientList);
         neededIngredients = (ArrayList) neededIngredientsTemp.clone();
         lives = 3;
         System.out.println("set: current level: " + currentLevel);
-
-
     }
-
-    //draw textures for the three lives
-    public static void drawLivesHearts(int lives) {
-        float x = GameApp.getWorldWidth() / (float) 2.4;
-        for (int i = 1; i <= lives; i++) {
-            GameApp.drawTexture("life", x, GameApp.getWorldHeight() - 130, BOWL_SIZE - 20, BOWL_SIZE - 20);
-            x += 45;
-
-
-        }
-    }
-
-    public static void drawRecipes(int currentLevel) {
-
-        //Draw bubble with image of finished product (ordered item)
-        GameApp.drawTexture("speech_bubble", 50, GameApp.getWorldHeight() - 150, BOWL_SIZE + 50, BOWL_SIZE + 30);
-        //Draw a customer
-        GameApp.drawTexture("customer_1", 10, GameApp.getWorldHeight() - 240, BOWL_SIZE, BOWL_SIZE);
-
-        GameApp.drawTexture(recipesArrayList.get(currentLevel - 1).name, 70, GameApp.getWorldHeight() - 130, INGREDIENT_SIZE, INGREDIENT_SIZE);
-
-
-    }
-
 }
-
-
-
-
