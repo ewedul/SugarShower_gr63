@@ -15,6 +15,8 @@ public class MainMenuScreen extends ScalableGameScreen {
 
     @Override
     public void show() {
+
+        GameApp.setCustomCursor("textures/strawberry_64.png",0,0);
         // Load background
         GameApp.addTexture("mainmenu", "textures/mainmenu.png");
 
