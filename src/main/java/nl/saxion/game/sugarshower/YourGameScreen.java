@@ -98,6 +98,7 @@ public class YourGameScreen extends ScalableGameScreen {
         GameApp.addTexture("life", "textures/life.png");
         GameApp.addTexture("background", "textures/playingbg.png");
         GameApp.addTexture("speech_bubble", "textures/text_bubble.png");
+        GameApp.addTexture("circle_bubble", "textures/circle_bubble.png");
         GameApp.addTexture("mute-button","textures/buttons/mute-button02.png");
 
         // Hearts textures
@@ -123,12 +124,6 @@ public class YourGameScreen extends ScalableGameScreen {
         GameApp.addFont("bubble_lists", "fonts/bubble.ttf", 15);
         GameApp.addFont("bubble_count", "fonts/bubble.ttf", 12);
         GameApp.addColor("customLine", 64, 15, 38);
-
-        // Load fonts - INCLUDING BUBBLE FONT
-        GameApp.addFont("bubble", "fonts/bubble.ttf", 40);      // Big bubble font for title
-        GameApp.addFont("bubble_small", "fonts/bubble.ttf", 25); // Smaller bubble for subtitle
-        GameApp.addFont("bubble_lists", "fonts/bubble.ttf", 15); // for ing name
-        GameApp.addFont("bubble_count", "fonts/bubble.ttf", 12); // for count
 
         // Load all ingredient images
         for (String ingredientName : ingredientTypes) {
@@ -349,7 +344,7 @@ public class YourGameScreen extends ScalableGameScreen {
         // Counter texture inside speech bubble - use scaled bubble
         float counterBubbleX = popupW / 15;
         float counterBubbleY = popupH - 220;
-        GameApp.drawTexture("speech_bubble", counterBubbleX, counterBubbleY, 100, 88); // Scaled: 100x88
+        GameApp.drawTexture("circle_bubble", counterBubbleX, counterBubbleY, 100, 88); // Scaled: 100x88
         GameApp.drawText("bubble", String.valueOf((int) memorizeTime), (popupW / 9), popupH - 190, "customLine");
 
         // Name of the current recipe texture
@@ -593,6 +588,7 @@ public class YourGameScreen extends ScalableGameScreen {
         GameApp.disposeTexture("heart_full");
         GameApp.disposeTexture("heart_empty");
         GameApp.disposeTexture("question_mark");
+        GameApp.disposeTexture("circle_bubble");
 
         GameApp.disposeTexture("mute-button");
 
