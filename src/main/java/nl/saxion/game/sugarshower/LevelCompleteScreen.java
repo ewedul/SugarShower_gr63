@@ -134,19 +134,21 @@ public class LevelCompleteScreen extends ScalableGameScreen {
         float bigPicX = 81;
         float bigPicY = 285;
 
-        // Right side: Ingredient list
-        float listX = 450;
+        // Right side: Ingredient list - TWO COLUMNS (similar to your example)
+        float listStartX = 450;
         float listY = getWorldHeight() - 305;
-        float ingredientSize = 60;
-        float rowHeight = 70;
+        float ingredientSize = 50;
+        float rowHeight = 75;
+        float columnSpacing = 135; // Space between columns
 
         // Draw big finished product picture
         GameApp.drawTexture("finished_product", bigPicX, bigPicY, 254, 232);
 
-        // Draw ingredient list on the right side
+        float currentX = listStartX;
         float currentY = listY;
 
-
+        int ingredientCounter = 0;
+        int itemsPerColumn = 4; // Show 4 items per column
 
         // Use a set to track already displayed ingredients (avoid duplicates in display)
         ArrayList<String> displayedIngredients = new ArrayList<>();
@@ -161,21 +163,27 @@ public class LevelCompleteScreen extends ScalableGameScreen {
             // Get count for this ingredient
             int count = ingredientCounts.get(ingredient);
 
-            // Draw ingredient icon (small)
-            GameApp.drawTexture(ingredient, listX, currentY, ingredientSize, ingredientSize);
+            // Move to second column after 4 items
+            if (ingredientCounter == itemsPerColumn) {
+                currentX += columnSpacing;
+                currentY = listY;
+            }
 
-            // Draw ingredient name and count
+            // Draw ingredient icon (small) - with offsets similar to your example
+            GameApp.drawTexture(ingredient, currentX - 15, currentY - 20, ingredientSize, ingredientSize);
+
+            // Draw ingredient name next to the icon
             String ingredientText = ingredient.replace("_", " ");
-            GameApp.drawText("bubble_lists", ingredientText, listX + ingredientSize,
-                    currentY + ingredientSize - 20, "customLine");
+            GameApp.drawText("bubble_lists", ingredientText, currentX + ingredientSize - 10,
+                    currentY + 5, "customLine");
 
             // Draw count in format "2/2" or "1/1"
             String countText = count + "/" + count; // Always show as complete (X/X)
-            GameApp.drawText("bubble_count", countText, listX + ingredientSize,
-                    currentY + 10, "customLine");
+            GameApp.drawText("bubble_count", countText, currentX + ingredientSize - 10,
+                    currentY - 10, "customLine");
 
-
-            currentY -= rowHeight; // Move down for next ingredient
+            ingredientCounter++;
+            currentY -= rowHeight;
         }
 
         //Coordinate of "NEXT" text in button
@@ -183,13 +191,10 @@ public class LevelCompleteScreen extends ScalableGameScreen {
         float nextX = buttonX + (buttonWidth - textWidth)/2;
         float nextY = buttonY+((buttonHeight-25)/2);
 
-
         // Draw button (always show selected since it's the only button)
         GameApp.drawTexture("next_button_selected", buttonX, buttonY,
                 buttonWidth, buttonHeight);
         GameApp.drawText("bubble_small","NEXT", nextX, nextY,"customLine");
-
-
 
         GameApp.endSpriteRendering();
     }

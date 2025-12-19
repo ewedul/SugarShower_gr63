@@ -17,10 +17,10 @@ public class YourGameScreen extends ScalableGameScreen {
     static ArrayList<String> neededIngredients;
 
     //GAME SETTINGS
-    public static final int BOWL_HEIGHT = 100;
-    public static final int BOWL_WIDTH = 75;
+    public static final int BOWL_HEIGHT = 110;
+    public static final int BOWL_WIDTH = 85;
     public static final int BOWL_SPEED = 600;
-    public static final int INGREDIENT_SIZE = 80;
+    public static final int INGREDIENT_SIZE = 65;
     public static final float bgMusicVolume = 0.5f;
     public static final float soundVolume = 0.8f;
 
@@ -356,35 +356,40 @@ public class YourGameScreen extends ScalableGameScreen {
         float bigPicX = 81;
         float bigPicY = 285;
 
-        // Right side: Ingredient list
-        float listX = 450;
+        // Right side: Ingredient list - TWO COLUMNS
+        float listStartX = 450;
         float listY = getWorldHeight() - 305;
-        float ingredientSize = 60;
+        float ingredientSize = 50;
         float rowHeight = 75;
+        float columnSpacing = 135; // Space between columns
 
         // Draw big finished product picture
         GameApp.drawTexture(recipesArrayList.get(currentLevel - 1).name, bigPicX, bigPicY, 254, 232);
 
-        float currentX = listX;
+        float currentX = listStartX;
         float currentY = listY;
 
         int ingredientCounter = 0;
+        int itemsPerColumn = 4; // Show 4 items per column
+
         for (String ingredient : recipesArrayList.get(currentLevel - 1).recipeIngredientList) {
+            // Move to second column after 4 items
+            if (ingredientCounter == itemsPerColumn) {
+                currentX += columnSpacing;
+                currentY = listY;
+            }
+
             // Draw ingredient icon (small)
             GameApp.drawTexture(ingredient, currentX - 15, currentY - 20, ingredientSize, ingredientSize);
 
-            // Draw ingredient name
+            // Draw ingredient name next to the icon
             String ingredientText = ingredient.replace("_", " ");
-            GameApp.drawText("bubble_lists", 1 + "X " + ingredientText, currentX,
-                    currentY + 40, "customLine");
+            GameApp.drawText("bubble_lists", ingredientText, currentX + ingredientSize - 10,
+                    currentY + 5, "customLine");
+            GameApp.drawText("bubble_count", "x1", currentX + ingredientSize - 10,
+                    currentY -10, "customLine");
 
             ingredientCounter++;
-
-            // Shift ingredient list X position if recipe longer than 4 so it fits on the booklet texture
-            if (ingredientCounter == 4) {
-                currentX += 150;
-                currentY = listY + ingredientSize;
-            }
             currentY -= rowHeight;
         }
     }
@@ -580,10 +585,13 @@ public class YourGameScreen extends ScalableGameScreen {
     }
 
     private boolean isColliding(Ingredient ingredient, Bowl bowl) {
-        return ingredient.x < bowl.x + BOWL_WIDTH &&
-                ingredient.x + INGREDIENT_SIZE > bowl.x &&
-                ingredient.y < bowl.y + BOWL_WIDTH &&
-                ingredient.y + INGREDIENT_SIZE > bowl.y;
+        float widthPadding = 5f;
+        float heightPadding = 15f;
+
+        return ingredient.x + widthPadding < bowl.x + BOWL_WIDTH - widthPadding &&
+                ingredient.x + INGREDIENT_SIZE - widthPadding > bowl.x + widthPadding &&
+                ingredient.y + heightPadding < bowl.y + BOWL_WIDTH - heightPadding &&
+                ingredient.y + INGREDIENT_SIZE - heightPadding > bowl.y + heightPadding;
     }
 
     @Override
@@ -681,7 +689,7 @@ public class YourGameScreen extends ScalableGameScreen {
 
     // Draw progress bar for caught ingredients
     private void drawProgress(ArrayList<Recipe> recipesArrayList, ArrayList<String> caughtIngredients) {
-        float spacing = 10;
+        float spacing = 5;
         int length = recipesArrayList.get(currentLevel - 1).recipeIngredientList.size();
         float startX = getWorldWidth() - QUESTION_MARK_SIZE - 20;
         float progressY = getWorldHeight() - QUESTION_MARK_SIZE * 3; // 20px padding from top
