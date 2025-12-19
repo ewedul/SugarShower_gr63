@@ -10,8 +10,8 @@ public class AudioControl {
         muteMode = !muteMode;
     }
 
-    public static void playMusic(String audioName, boolean flag, float volume) {
-        GameApp.playMusic(audioName, flag, AudioControl.muteMode? 0f:volume);
+    public static void playMusic(String audioName, boolean loop, float volume) {
+        GameApp.playMusic(audioName, loop, AudioControl.muteMode? 0f:volume);
     }
 
     public static void playSound(String audioName, float volume) {
