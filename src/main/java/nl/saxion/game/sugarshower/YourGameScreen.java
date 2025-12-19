@@ -12,7 +12,7 @@ import java.util.Random;
 public class YourGameScreen extends ScalableGameScreen {
 
     // LEVEL SYSTEM
-    static int currentLevel = 1;
+    static int currentLevel = 9;
     ArrayList<String> neededIngredientsTemp;
     static ArrayList<String> neededIngredients;
 
@@ -39,7 +39,7 @@ public class YourGameScreen extends ScalableGameScreen {
     float spawnTimer;
     float spawnInterval = 1.0f;
     String lastSpawnedType = "";
-    Button muteButton = new Button(getWorldWidth() - ((float)1.5*HEART_SIZE),getWorldHeight()-3*HEART_SIZE, 40,40);
+    Button muteButton = new Button(getWorldWidth() - ((float) 1.5 * HEART_SIZE), getWorldHeight() - 3 * HEART_SIZE, 40, 40);
 
     //CSV DATA
     static ArrayList<Recipe> recipesArrayList = readCSVRecipes("src/main/resources/recipes.csv");
@@ -99,7 +99,7 @@ public class YourGameScreen extends ScalableGameScreen {
         GameApp.addTexture("background", "textures/playingbg.png");
         GameApp.addTexture("speech_bubble", "textures/text_bubble.png");
         GameApp.addTexture("circle_bubble", "textures/circle_bubble.png");
-        GameApp.addTexture("mute-button","textures/buttons/mute-button02.png");
+        GameApp.addTexture("mute-button", "textures/buttons/mute-button02.png");
 
         // Hearts textures
         GameApp.addTexture("heart_full", "textures/heart_full.png");
@@ -192,7 +192,7 @@ public class YourGameScreen extends ScalableGameScreen {
 
 
         // Mute option
-        if (GameApp.isKeyJustPressed(Input.Keys.M) || muteButton.isButtonClicked(getMouseX(),getMouseY())) {
+        if (GameApp.isKeyJustPressed(Input.Keys.M) || muteButton.isButtonClicked(getMouseX(), getMouseY())) {
             AudioControl.toggleMuteMode();
             GameApp.getMusic("bg-music").setVolume(AudioControl.muteMode ? 0f : bgMusicVolume);
         }
@@ -214,7 +214,7 @@ public class YourGameScreen extends ScalableGameScreen {
         GameApp.drawTexture("bowl", bowl.x, bowl.y, BOWL_WIDTH, BOWL_HEIGHT);
 
         //Draw mute button
-        GameApp.drawTexture("mute-button",getWorldWidth() - ((float)1.5*HEART_SIZE),getWorldHeight()-3*HEART_SIZE, 40,40);
+        GameApp.drawTexture("mute-button", getWorldWidth() - ((float) 1.5 * HEART_SIZE), getWorldHeight() - 3 * HEART_SIZE, 40, 40);
 
 
         //Draw falling ingredients
@@ -263,7 +263,7 @@ public class YourGameScreen extends ScalableGameScreen {
         float customerX = 0;
         float customerY = getWorldHeight() - CUSTOMER_SIZE;
 
-        float bubbleX = customerX + CUSTOMER_SIZE ; // Next to customer
+        float bubbleX = customerX + CUSTOMER_SIZE; // Next to customer
         float bubbleY = getWorldHeight() - BUBBLE_HEIGHT - 20;
 
         // Calculate center of bubble for the order
@@ -413,7 +413,7 @@ public class YourGameScreen extends ScalableGameScreen {
         spawnTimer += delta;
 
         /**
-         * Adjust speed and number of falling ingredients
+         * Adjust speed and amount of falling ingredients
          */
         int ingredientSpeed = 200;
         if (currentLevel > 5) ingredientSpeed += 100;
@@ -425,7 +425,7 @@ public class YourGameScreen extends ScalableGameScreen {
 
 
         if (spawnTimer >= adjustedSpawnInterval) {
-            // Determine how many ingredients to spawn based on phase
+            // Determine amount ingredients to spawn based on phase
             int minIngredientsPerSpawn = 1;
             int maxIngredientsPerSpawn = 2;
 
@@ -452,11 +452,11 @@ public class YourGameScreen extends ScalableGameScreen {
     }
 
     /**
-     * Adjust position of every falling ingredients to avoid duplication and overlaps
+     * Adjust every falling ingredients to avoid duplicated types and overlapping position
      */
     private void spawnSingleIngredient(int baseSpeed) {
         String randomType;
-        ArrayList<String>ingredientsCurrentPhase = findIngredientsInPhase(getCurrentPhase());
+        ArrayList<String> unlockedIngredients = releaseIngredientByLevel(currentLevel);
 
         if (random.nextFloat() < 0.6f && !neededIngredients.isEmpty()) {
             ArrayList<String> stillNeeded = new ArrayList<>(neededIngredients);
@@ -464,15 +464,15 @@ public class YourGameScreen extends ScalableGameScreen {
             if (!stillNeeded.isEmpty()) {
                 randomType = stillNeeded.get(random.nextInt(neededIngredients.size()));
             } else {
-                randomType = ingredientsCurrentPhase.get(SaxionApp.getRandomValueBetween(0, ingredientsCurrentPhase.size()));
+                randomType = unlockedIngredients.get(random.nextInt(unlockedIngredients.size()));
             }
         } else {
-            randomType = ingredientsCurrentPhase.get(SaxionApp.getRandomValueBetween(0, ingredientsCurrentPhase.size()));
+            randomType = unlockedIngredients.get(random.nextInt(unlockedIngredients.size()));
         }
 
         if (lastSpawnedType != null) {
             while (randomType.equals(lastSpawnedType)) {
-                randomType = ingredientsCurrentPhase.get(SaxionApp.getRandomValueBetween(0, ingredientsCurrentPhase.size()));
+                randomType = unlockedIngredients.get(SaxionApp.getRandomValueBetween(0, unlockedIngredients.size()));
             }
             lastSpawnedType = randomType;
         }
@@ -673,21 +673,14 @@ public class YourGameScreen extends ScalableGameScreen {
         return currentLevel;
     }
 
-    public int getCurrentPhase(){
-        int currentPhase = 1;
-       if(currentLevel>5) currentPhase++;
-       if(currentLevel>10) currentPhase++;
-       return currentPhase;
-    }
-
-    public ArrayList<String> findIngredientsInPhase(int phase){
+    public ArrayList<String> releaseIngredientByLevel(int currentLevel) {
         ArrayList<String> ingredientsList = new ArrayList<>();
 
-        for(Recipe recipe: recipesArrayList){
-            if (recipe.phase == phase){
+        for (Recipe recipe : recipesArrayList) {
+            if (recipe.level <= currentLevel) {
 
-                for(String ingredientType: recipe.recipeIngredientList){
-                    if(!ingredientsList.contains(ingredientType)){
+                for (String ingredientType : recipe.recipeIngredientList) {
+                    if (!ingredientsList.contains(ingredientType)) {
                         ingredientsList.add(ingredientType);
                     }
                 }
