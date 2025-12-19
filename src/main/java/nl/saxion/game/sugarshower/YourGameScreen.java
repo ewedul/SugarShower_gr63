@@ -12,7 +12,7 @@ import java.util.Random;
 public class YourGameScreen extends ScalableGameScreen {
 
     // LEVEL SYSTEM
-    static int currentLevel = 9;
+    static int currentLevel = 1;
     ArrayList<String> neededIngredientsTemp;
     static ArrayList<String> neededIngredients;
 
@@ -409,17 +409,18 @@ public class YourGameScreen extends ScalableGameScreen {
         bowl.x = GameApp.clamp(bowl.x, 0, getWorldWidth() - (BOWL_HEIGHT));
     }
 
+    /**
+     * Adjust speed and amount of ingredients that fall
+     */
     private void spawnIngredients(float delta) {
         spawnTimer += delta;
 
-        /**
-         * Adjust speed and amount of falling ingredients
-         */
+
         int ingredientSpeed = 200;
         if (currentLevel > 5) ingredientSpeed += 100;
         if (currentLevel > 10) ingredientSpeed += 100;
 
-
+        // Adjust spawn interval by level
         float adjustedSpawnInterval = spawnInterval - (currentLevel * 0.03f);
         if (adjustedSpawnInterval < 0.4f) adjustedSpawnInterval = 0.4f;
 
@@ -456,23 +457,21 @@ public class YourGameScreen extends ScalableGameScreen {
      */
     private void spawnSingleIngredient(int baseSpeed) {
         String randomType;
-        ArrayList<String> unlockedIngredients = releaseIngredientByLevel(currentLevel);
 
         if (random.nextFloat() < 0.6f && !neededIngredients.isEmpty()) {
             ArrayList<String> stillNeeded = new ArrayList<>(neededIngredients);
-
             if (!stillNeeded.isEmpty()) {
-                randomType = stillNeeded.get(random.nextInt(neededIngredients.size()));
+                randomType = stillNeeded.get(random.nextInt(stillNeeded.size()));
             } else {
-                randomType = unlockedIngredients.get(random.nextInt(unlockedIngredients.size()));
+                randomType = ingredientTypes.get(SaxionApp.getRandomValueBetween(0, ingredientTypes.size()));
             }
         } else {
-            randomType = unlockedIngredients.get(random.nextInt(unlockedIngredients.size()));
+            randomType = ingredientTypes.get(SaxionApp.getRandomValueBetween(0, ingredientTypes.size()));
         }
 
         if (lastSpawnedType != null) {
             while (randomType.equals(lastSpawnedType)) {
-                randomType = unlockedIngredients.get(SaxionApp.getRandomValueBetween(0, unlockedIngredients.size()));
+                randomType = ingredientTypes.get(SaxionApp.getRandomValueBetween(0, ingredientTypes.size()));
             }
             lastSpawnedType = randomType;
         }
@@ -671,22 +670,6 @@ public class YourGameScreen extends ScalableGameScreen {
 
     public static int getCurrentLevel() {
         return currentLevel;
-    }
-
-    public ArrayList<String> releaseIngredientByLevel(int currentLevel) {
-        ArrayList<String> ingredientsList = new ArrayList<>();
-
-        for (Recipe recipe : recipesArrayList) {
-            if (recipe.level <= currentLevel) {
-
-                for (String ingredientType : recipe.recipeIngredientList) {
-                    if (!ingredientsList.contains(ingredientType)) {
-                        ingredientsList.add(ingredientType);
-                    }
-                }
-            }
-        }
-        return ingredientsList;
     }
 
     public static void setLevel(int currentLevel) {
