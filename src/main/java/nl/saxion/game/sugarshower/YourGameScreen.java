@@ -4,7 +4,6 @@ import com.badlogic.gdx.Input;
 import nl.saxion.gameapp.GameApp;
 import nl.saxion.gameapp.screens.ScalableGameScreen;
 import nl.saxion.app.CsvReader;
-import nl.saxion.app.SaxionApp;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -53,6 +52,7 @@ public class YourGameScreen extends ScalableGameScreen {
     int countIngredientsCaught;
 
     static int lives = 3;
+    int maxLives = 3;
 
     //POPUP -- Memorize Recipe
     boolean memorizeMode = true;
@@ -311,7 +311,6 @@ public class YourGameScreen extends ScalableGameScreen {
      * Shows full hearts for remaining lives, empty hearts for lost lives
      */
     private void drawLivesHearts(int lives) {
-        int maxLives = 3;
         float spacing = 10;
 
         // Calculate total width of hearts to center them in top right
@@ -387,7 +386,7 @@ public class YourGameScreen extends ScalableGameScreen {
             GameApp.drawText("bubble_lists", ingredientText, currentX + ingredientSize - 10,
                     currentY + 5, "customLine");
             GameApp.drawText("bubble_count", "x1", currentX + ingredientSize - 10,
-                    currentY -10, "customLine");
+                    currentY - 10, "customLine");
 
             ingredientCounter++;
             currentY -= rowHeight;
@@ -465,18 +464,14 @@ public class YourGameScreen extends ScalableGameScreen {
 
         if (random.nextFloat() < 0.6f && !neededIngredients.isEmpty()) {
             ArrayList<String> stillNeeded = new ArrayList<>(neededIngredients);
-            if (!stillNeeded.isEmpty()) {
-                randomType = stillNeeded.get(random.nextInt(stillNeeded.size()));
-            } else {
-                randomType = ingredientTypes.get(SaxionApp.getRandomValueBetween(0, ingredientTypes.size()));
-            }
+            randomType = stillNeeded.get(random.nextInt(stillNeeded.size()));
         } else {
-            randomType = ingredientTypes.get(SaxionApp.getRandomValueBetween(0, ingredientTypes.size()));
+            randomType = getRandomIngredientType();
         }
 
         if (lastSpawnedType != null) {
             while (randomType.equals(lastSpawnedType)) {
-                randomType = ingredientTypes.get(SaxionApp.getRandomValueBetween(0, ingredientTypes.size()));
+                randomType = getRandomIngredientType();
             }
             lastSpawnedType = randomType;
         }
@@ -511,6 +506,20 @@ public class YourGameScreen extends ScalableGameScreen {
         newIngredient.y = getWorldHeight() - 200;
         ingredients.add(newIngredient);
     }
+
+
+    private boolean canGainLife() {
+        return lives < maxLives;
+    }
+
+    private String getRandomIngredientType() {
+        ArrayList<String> possibleIngredients = new ArrayList<>(ingredientTypes);
+        if (!canGainLife()) {
+            possibleIngredients.remove("life");
+        }
+            return possibleIngredients.get(random.nextInt(possibleIngredients.size()));
+    }
+
 
     private void updateIngredients(float delta) {
         for (int i = ingredients.size() - 1; i >= 0; i--) {
@@ -558,7 +567,7 @@ public class YourGameScreen extends ScalableGameScreen {
 
                     currentLevel++;
 
-                    if (currentLevel - 1 > recipesArrayList.size()) {
+                    if (currentLevel - 1 >= recipesArrayList.size()) {
                         GameApp.switchScreen("VictoryScreen");
                         //Link to GameOver screen for now until we figure out the level system - Nhi
                     }
