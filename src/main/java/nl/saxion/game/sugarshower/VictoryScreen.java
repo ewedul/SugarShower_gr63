@@ -14,6 +14,7 @@ public class VictoryScreen extends ScalableGameScreen {
 
     private int selectedButton = 0;
 
+    GameData gameData;
     Random random;
     float spawnTimer;
     float spawnInterval = 1.0f;
@@ -30,7 +31,11 @@ public class VictoryScreen extends ScalableGameScreen {
         worldWidth = GameApp.getWorldWidth();
         worldHeight = GameApp.getWorldHeight();
 
-
+        if (GameApp.hasItemInStore("game-data")) {
+            gameData = (GameData) GameApp.getItemFromStore("game-data");
+        } else {
+            System.out.println("No sharedData found in the store.");
+        }
 
         GameApp.addTexture("gameover_background", "textures/gameover_bg.png");
 
@@ -65,7 +70,9 @@ public class VictoryScreen extends ScalableGameScreen {
         if (GameApp.isKeyJustPressed(Input.Keys.ENTER)) {
             if (selectedButton == 0) {
                 // Retry button pressed - go back to game
-                YourGameScreen.setLevel(YourGameScreen.getCurrentLevel());
+//                YourGameScreen.setLevel(YourGameScreen.getCurrentLevel());
+
+                gameData.currentLevel = 1;
                 GameApp.switchScreen("YourGameScreen");
             } else {
                 // Main menu button pressed

@@ -3,8 +3,14 @@ package nl.saxion.game;
 import nl.saxion.game.sugarshower.*;
 import nl.saxion.gameapp.GameApp;
 
+import java.util.ArrayList;
+
 public class Main {
     public static void main(String[] args) {
+
+        GameData sharedData = new GameData();
+        GameApp.addItemToStore("game-data", sharedData);
+
         // Add screens
         GameApp.addScreen("MainMenuScreen", new MainMenuScreen());
         GameApp.addScreen("YourGameScreen", new YourGameScreen());
@@ -15,4 +21,5 @@ public class Main {
         // Start game loop and show main menu screen
         GameApp.start("Sugar Shower", 800, 800, 60, false, "MainMenuScreen");
     }
+
 }

@@ -1,12 +1,7 @@
 package nl.saxion.game.sugarshower;
-
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.backends.lwjgl3.audio.Mp3;
+
 import nl.saxion.gameapp.GameApp;
-import nl.saxion.gameapp.gameobject.GameObject;
 import nl.saxion.gameapp.screens.ScalableGameScreen;
 
 public class GameOverScreen extends ScalableGameScreen {
@@ -57,7 +52,7 @@ public class GameOverScreen extends ScalableGameScreen {
         if (GameApp.isKeyJustPressed(Input.Keys.ENTER)) {
             if (selectedButton == 0) {
                 // Retry button pressed - go back to game
-                YourGameScreen.setLevel(YourGameScreen.getCurrentLevel());
+//                YourGameScreen.setLevel(YourGameScreen.getCurrentLevel());
                 GameApp.switchScreen("YourGameScreen");
             } else {
                 // Main menu button pressed
@@ -96,7 +91,7 @@ public class GameOverScreen extends ScalableGameScreen {
         if (GameApp.pointInRect(mouseX, mouseY, startX, startY, normalWidth, normalHeight)) {
             selectedButton = 0;
             if (GameApp.isButtonJustPressed(Input.Buttons.LEFT)) {
-                YourGameScreen.setLevel(YourGameScreen.getCurrentLevel());
+//                YourGameScreen.setLevel(YourGameScreen.getCurrentLevel());
                 GameApp.switchScreen("YourGameScreen");
             }
         } else if (GameApp.pointInRect(mouseX, mouseY, startX, exitY, normalWidth, normalHeight)) {

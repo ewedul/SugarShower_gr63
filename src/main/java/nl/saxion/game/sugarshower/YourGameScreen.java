@@ -12,9 +12,12 @@ import java.util.Random;
 public class YourGameScreen extends ScalableGameScreen {
 
     // LEVEL SYSTEM
-    static int currentLevel = 1;
-    ArrayList<String> neededIngredientsTemp;
-    static ArrayList<String> neededIngredients;
+    GameData gameData;
+
+//    static int currentLevel = 1;
+//    ArrayList<String> neededIngredientsTemp;
+//    static ArrayList<String> neededIngredients;
+    ArrayList<String> neededIngredients;
 
     //GAME SETTINGS
     public static final int BOWL_HEIGHT = 100;
@@ -42,12 +45,11 @@ public class YourGameScreen extends ScalableGameScreen {
     Button muteButton = new Button(getWorldWidth() - ((float) 1.5 * HEART_SIZE), getWorldHeight() - 3 * HEART_SIZE, 40, 40);
 
     //CSV DATA
-    static ArrayList<Recipe> recipesArrayList = readCSVRecipes("src/main/resources/recipes.csv");
+//    static ArrayList<Recipe> recipesArrayList = readCSVRecipes("src/main/resources/recipes.csv");
+    ArrayList<Recipe> recipesArrayList = readCSVRecipes("src/main/resources/recipes.csv");
+//    ArrayList<Recipe> recipesArrayList;
     ArrayList<String> ingredientTypes = readCSVIngredients("src/main/resources/ingredients.csv");
 
-
-    // -- (We'll implement later, I got a bug -- Wina :))
-    // recipesArrayList.get(currentLevel).recipeIngredientList;
 
     ArrayList<String> caughtIngredients = new ArrayList<>();
     int countIngredientsCaught;
@@ -70,7 +72,16 @@ public class YourGameScreen extends ScalableGameScreen {
     @Override
     public void show() {
 
-        setLevel(currentLevel);
+        if (GameApp.hasItemInStore("game-data")) {
+            gameData = (GameData) GameApp.getItemFromStore("game-data");
+        } else {
+            System.out.println("No sharedData found in the store.");
+        }
+//        gameData.recipeArrayList = readCSVRecipes("src/main/resources/recipes.csv");
+//        recipesArrayList = gameData.recipeArrayList;
+
+//        setLevel(currentLevel);
+        setLevel();
 
         // clear ing for the new level
         caughtIngredients.clear();
@@ -185,7 +196,7 @@ public class YourGameScreen extends ScalableGameScreen {
             GameApp.switchScreen("GameOverScreen");
             //Link to GameOver screen for now until we figure out the level system - Nhi
         }
-        if (currentLevel > 15) {
+        if (gameData.currentLevel > 15) {
             GameApp.switchScreen("VictoryScreen");
             //Link to GameOver screen for now until we figure out the level system - Nhi
         }
@@ -232,7 +243,7 @@ public class YourGameScreen extends ScalableGameScreen {
 
         // ===== NEW UI LAYOUT =====
         // Draw all top UI elements
-        if (currentLevel <= recipesArrayList.size()) {
+        if (gameData.currentLevel <= recipesArrayList.size()) {
             drawTopUI();
         }
 
@@ -278,8 +289,8 @@ public class YourGameScreen extends ScalableGameScreen {
         GameApp.drawTexture("speech_bubble", bubbleX, bubbleY, BUBBLE_WIDTH, BUBBLE_HEIGHT);
 
         // Draw order (finished product) centered in bubble
-        if (currentLevel < 16) {
-            String orderTexture = recipesArrayList.get(currentLevel - 1).name;
+        if (gameData.currentLevel < 16) {
+            String orderTexture = recipesArrayList.get(gameData.currentLevel - 1).name;
             GameApp.drawTexture(orderTexture, orderX, orderY, ORDER_SIZE, ORDER_SIZE);
 
         }
@@ -295,12 +306,12 @@ public class YourGameScreen extends ScalableGameScreen {
         float textY = getWorldHeight() - 30;
 
         // Level number
-        String levelText = "Lv." + currentLevel;
+        String levelText = "Lv." + gameData.currentLevel;
         GameApp.drawTextHorizontallyCentered("bubble_small", levelText,
                 centerX, textY, "customLine");
 
         // Recipe name below level
-        String recipeName = recipesArrayList.get(currentLevel - 1).name.replace("_", " ");
+        String recipeName = recipesArrayList.get(gameData.currentLevel - 1).name.replace("_", " ");
         GameApp.drawTextHorizontallyCentered("roboto", recipeName,
                 centerX, textY - 30, "customLine");
     }
@@ -348,7 +359,7 @@ public class YourGameScreen extends ScalableGameScreen {
         GameApp.drawText("bubble", String.valueOf((int) memorizeTime), (popupW / 9), popupH - 190, "customLine");
 
         // Name of the current recipe texture
-        GameApp.drawText("bubble_small", recipesArrayList.get(currentLevel - 1).name.replace("_", " "),
+        GameApp.drawText("bubble_small", recipesArrayList.get(gameData.currentLevel - 1).name.replace("_", " "),
                 80, 550, "customLine");
 
         // ===== LAYOUT =====
@@ -363,13 +374,13 @@ public class YourGameScreen extends ScalableGameScreen {
         float rowHeight = 75;
 
         // Draw big finished product picture
-        GameApp.drawTexture(recipesArrayList.get(currentLevel - 1).name, bigPicX, bigPicY, 254, 232);
+        GameApp.drawTexture(recipesArrayList.get(gameData.currentLevel - 1).name, bigPicX, bigPicY, 254, 232);
 
         float currentX = listX;
         float currentY = listY;
 
         int ingredientCounter = 0;
-        for (String ingredient : recipesArrayList.get(currentLevel - 1).recipeIngredientList) {
+        for (String ingredient : recipesArrayList.get(gameData.currentLevel - 1).recipeIngredientList) {
             // Draw ingredient icon (small)
             GameApp.drawTexture(ingredient, currentX - 15, currentY - 20, ingredientSize, ingredientSize);
 
@@ -417,11 +428,11 @@ public class YourGameScreen extends ScalableGameScreen {
 
 
         int ingredientSpeed = 200;
-        if (currentLevel > 5) ingredientSpeed += 100;
-        if (currentLevel > 10) ingredientSpeed += 100;
+        if (gameData.currentLevel > 5) ingredientSpeed += 100;
+        if (gameData.currentLevel > 10) ingredientSpeed += 100;
 
         // Adjust spawn interval by level
-        float adjustedSpawnInterval = spawnInterval - (currentLevel * 0.03f);
+        float adjustedSpawnInterval = spawnInterval - (gameData.currentLevel * 0.03f);
         if (adjustedSpawnInterval < 0.4f) adjustedSpawnInterval = 0.4f;
 
 
@@ -430,11 +441,11 @@ public class YourGameScreen extends ScalableGameScreen {
             int minIngredientsPerSpawn = 1;
             int maxIngredientsPerSpawn = 2;
 
-            if (currentLevel > 5) {
+            if (gameData.currentLevel > 5) {
                 minIngredientsPerSpawn = 2;
                 maxIngredientsPerSpawn = 3;
             }
-            if (currentLevel > 10) {
+            if (gameData.currentLevel > 10) {
                 minIngredientsPerSpawn = 2;
                 maxIngredientsPerSpawn = 4;
             }
@@ -547,24 +558,24 @@ public class YourGameScreen extends ScalableGameScreen {
                 ingredients.remove(i);
 
                 if (neededIngredients.isEmpty()) {
-                    Recipe completedRecipe = recipesArrayList.get(currentLevel - 1);
+                    Recipe completedRecipe = recipesArrayList.get(gameData.currentLevel - 1);
                     LevelCompleteScreen.setCompletedRecipe(completedRecipe, caughtIngredients);
 
 
-                    currentLevel++;
+                    gameData.currentLevel++;
 
-                    if (currentLevel - 1 > recipesArrayList.size()) {
+                    if (gameData.currentLevel - 1 > recipesArrayList.size()) {
                         GameApp.switchScreen("VictoryScreen");
                         //Link to GameOver screen for now until we figure out the level system - Nhi
                     }
-                    if (currentLevel < recipesArrayList.size()) {
+                    if (gameData.currentLevel < recipesArrayList.size()) {
                         selectRandomCustomer();
 
                     }
                     // Select new customer for next level
 
 
-                    if (currentLevel - 1 > recipesArrayList.size()) {
+                    if (gameData.currentLevel - 1 > recipesArrayList.size()) {
                         GameApp.switchScreen("VictoryScreen");
                         return;
                     }
@@ -668,35 +679,46 @@ public class YourGameScreen extends ScalableGameScreen {
         return recipes;
     }
 
-    public static int getCurrentLevel() {
-        return currentLevel;
-    }
+//    public int getCurrentLevel() {
+//        return gameData.currentLevel;
+//    }
 
-    public static void setLevel(int currentLevel) {
-        ArrayList<String> neededIngredientsTemp = new ArrayList<>(recipesArrayList.get(currentLevel - 1).recipeIngredientList);
-        neededIngredients = (ArrayList) neededIngredientsTemp.clone();
+//    public void setLevel(int currentLevel) {
+
+    /// /        ArrayList<String> neededIngredientsTemp = new ArrayList<>(recipesArrayList.get(currentLevel - 1).recipeIngredientList);
+    /// /        neededIngredients = (ArrayList) neededIngredientsTemp.clone();
+//
+//        lives = 3;
+//        System.out.println("set: current level: " + currentLevel);
+//    }
+
+//    public void restart(){
+//        gameData.currentLevel=1;
+//    }
+
+    public void setLevel() {
+        neededIngredients = new ArrayList<>(recipesArrayList.get(gameData.currentLevel - 1).recipeIngredientList);
         lives = 3;
-        System.out.println("set: current level: " + currentLevel);
+        System.out.println("set: current level: " + gameData.currentLevel);
     }
+        // Draw progress bar for caught ingredients
+        private void drawProgress (ArrayList < Recipe > recipesArrayList, ArrayList < String > caughtIngredients){
+            float spacing = 10;
+            int length = recipesArrayList.get(gameData.currentLevel - 1).recipeIngredientList.size();
+            float startX = getWorldWidth() - QUESTION_MARK_SIZE - 20;
+            float progressY = getWorldHeight() - QUESTION_MARK_SIZE * 3; // 20px padding from top
 
-    // Draw progress bar for caught ingredients
-    private void drawProgress(ArrayList<Recipe> recipesArrayList, ArrayList<String> caughtIngredients) {
-        float spacing = 10;
-        int length = recipesArrayList.get(currentLevel - 1).recipeIngredientList.size();
-        float startX = getWorldWidth() - QUESTION_MARK_SIZE - 20;
-        float progressY = getWorldHeight() - QUESTION_MARK_SIZE * 3; // 20px padding from top
+            for (int i = 0; i < length; i++) {
+                float progressX = startX - (i * (QUESTION_MARK_SIZE + spacing));
 
-        for (int i = 0; i < length; i++) {
-            float progressX = startX - (i * (QUESTION_MARK_SIZE + spacing));
-
-            //Draw question marks if caught ingredients list is empty, draw ingredient otherwise
-            if (i < caughtIngredients.size()) {
-                GameApp.drawTexture(caughtIngredients.get(i), progressX, progressY, QUESTION_MARK_SIZE, QUESTION_MARK_SIZE * 0.85f);
-            } else {
-                GameApp.drawTexture("question_mark", progressX, progressY, QUESTION_MARK_SIZE, QUESTION_MARK_SIZE * 0.85f);
+                //Draw question marks if caught ingredients list is empty, draw ingredient otherwise
+                if (i < caughtIngredients.size()) {
+                    GameApp.drawTexture(caughtIngredients.get(i), progressX, progressY, QUESTION_MARK_SIZE, QUESTION_MARK_SIZE * 0.85f);
+                } else {
+                    GameApp.drawTexture("question_mark", progressX, progressY, QUESTION_MARK_SIZE, QUESTION_MARK_SIZE * 0.85f);
+                }
             }
         }
+
+
     }
-
-
-}
