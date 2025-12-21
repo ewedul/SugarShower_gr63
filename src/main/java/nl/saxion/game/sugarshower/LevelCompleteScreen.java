@@ -86,7 +86,7 @@ public class LevelCompleteScreen extends ScalableGameScreen {
         System.out.println("Ingredient counts: " + ingredientCounts);
 
         // A correct caught sound because otherwise it was silent lol
-        GameApp.playSound("correct caught");
+        AudioControl.playSound("correct caught",soundVolume);
     }
 
     @Override
