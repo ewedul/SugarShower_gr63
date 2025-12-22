@@ -178,6 +178,10 @@ public class YourGameScreen extends ScalableGameScreen {
         if (GameApp.isKeyJustPressed(Input.Keys.ESCAPE)) {
             GameApp.switchScreen("GameOverScreen"); //quit() method ends the game too abruptly.
         }
+        // Press V for Victory screen. For testing. Delete later.
+        if (GameApp.isKeyJustPressed(Input.Keys.V)) {
+            GameApp.switchScreen("VictoryScreen"); //quit() method ends the game too abruptly.
+        }
 
         if (lives <= 0) {
             GameApp.switchScreen("GameOverScreen");
