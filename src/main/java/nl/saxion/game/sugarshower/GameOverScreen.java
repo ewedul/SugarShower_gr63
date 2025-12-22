@@ -29,7 +29,10 @@ public class GameOverScreen extends ScalableGameScreen {
         GameApp.addTexture("retry", "textures/buttons/retry_button.png");
         GameApp.addTexture("speech", "textures/speech_bubble.png");
 
-        GameApp.addTexture("button","textures/buttons/button2.png");
+        GameApp.addTexture("unmute-button", "textures/buttons/unmute-pixel.png");
+        GameApp.addTexture("mute-button", "textures/buttons/mute-pixel.png");
+
+        GameApp.addTexture("button", "textures/buttons/button2.png");
         GameApp.addColor("customcolor", 64, 15, 38);
         GameApp.addMusic("gameover-music", "audio/gameover-music.mp3");
         AudioControl.playMusic("gameover-music", true, YourGameScreen.bgMusicVolume);
@@ -60,8 +63,15 @@ public class GameOverScreen extends ScalableGameScreen {
             }
         }
 
-        //Press M to turn on Mute Mode.
-        if (GameApp.isKeyJustPressed(Input.Keys.M)) {
+        //Press M or click sound icon to switch Mute Mode.
+        float muteButtonSize = 50f;
+        float muteX = getWorldWidth() - (float) 1.2 * muteButtonSize;
+        float muteY = getWorldHeight() - (float) 1.2 * muteButtonSize;
+
+        Button muteButton = new Button(muteX, muteY, muteButtonSize, muteButtonSize);
+
+        if (GameApp.isKeyJustPressed(Input.Keys.M)
+                || muteButton.isButtonClicked(getMouseX(), getMouseY())) {
             AudioControl.toggleMuteMode();
             GameApp.getMusic("gameover-music").
                     setVolume(AudioControl.muteMode ? 0f : YourGameScreen.bgMusicVolume);
@@ -162,6 +172,13 @@ public class GameOverScreen extends ScalableGameScreen {
                 textCenterX, textCenterY, "customcolor"); // Second line below
         GameApp.drawTextHorizontallyCentered("bubble", message3,
                 textCenterX, textCenterY - 25, "customcolor");
+
+        //Draw mute button
+        if (AudioControl.muteMode) {
+            GameApp.drawTexture("unmute-button", muteX, muteY, muteButtonSize, muteButtonSize);
+        } else {
+            GameApp.drawTexture("mute-button", muteX, muteY, muteButtonSize, muteButtonSize);
+        }
 
         GameApp.endSpriteRendering();
     }

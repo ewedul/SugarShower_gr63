@@ -28,6 +28,9 @@ public class MainMenuScreen extends ScalableGameScreen {
         GameApp.addTexture("start_button_selected", "textures/buttons/start_selected.png");
         GameApp.addTexture("exit_button_selected", "textures/buttons/exit_selected.png");
 
+        GameApp.addTexture("unmute-button", "textures/buttons/unmute-pixel.png");
+        GameApp.addTexture("mute-button", "textures/buttons/mute-pixel.png");
+
         // Load font for additional text
         GameApp.addFont("basic", "fonts/basic.ttf", 50);
     }
@@ -56,7 +59,7 @@ public class MainMenuScreen extends ScalableGameScreen {
             }
         }
 
-        // Button dimensions - Nhi: sorry Candy, I move this up to calculate variables for my code
+        // Button dimensions
         float normalWidth = 300;
         float normalHeight = 180;
         float selectedWidth = 350;
@@ -89,6 +92,17 @@ public class MainMenuScreen extends ScalableGameScreen {
             }
         }
 
+        float muteButtonSize = 50f;
+        float muteX = getWorldWidth() - (float) 1.2 * muteButtonSize;
+        float muteY = getWorldHeight() - (float) 1.2 * muteButtonSize;
+
+        Button muteButton = new Button(muteX, muteY, muteButtonSize, muteButtonSize);
+
+        // Press M or click mute icon to mute audios
+        if (GameApp.isKeyJustPressed(Input.Keys.M)
+                || muteButton.isButtonClicked(getMouseX(), getMouseY())) {
+            AudioControl.toggleMuteMode();
+        }
 
         // ===== RENDERING =====
         GameApp.clearScreen();
@@ -108,7 +122,7 @@ public class MainMenuScreen extends ScalableGameScreen {
                     centerX, exitButtonY,
                     normalWidth, normalHeight);
 
-        } else if (selectedButton ==1){
+        } else if (selectedButton == 1) {
             // Start button is NOT selected - use normal texture
             GameApp.drawTextureCentered("start_button_normal",
                     centerX, startButtonY,
@@ -117,6 +131,13 @@ public class MainMenuScreen extends ScalableGameScreen {
             GameApp.drawTextureCentered("exit_button_selected",
                     centerX, exitButtonY,
                     selectedWidth, selectedHeight);
+        }
+
+        //Draw mute button
+        if (AudioControl.muteMode) {
+            GameApp.drawTexture("unmute-button", muteX, muteY, muteButtonSize, muteButtonSize);
+        } else {
+            GameApp.drawTexture("mute-button", muteX, muteY, muteButtonSize, muteButtonSize);
         }
 
         GameApp.endSpriteRendering();
@@ -131,5 +152,7 @@ public class MainMenuScreen extends ScalableGameScreen {
         GameApp.disposeTexture("exit_button_normal");
         GameApp.disposeTexture("start_button_selected");
         GameApp.disposeTexture("exit_button_selected");
+        GameApp.disposeTexture("unmute-button");
+        GameApp.disposeTexture("mute-button");
     }
 }

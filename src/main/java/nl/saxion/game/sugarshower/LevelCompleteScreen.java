@@ -3,9 +3,7 @@ package nl.saxion.game.sugarshower;
 import com.badlogic.gdx.Input;
 import nl.saxion.gameapp.GameApp;
 import nl.saxion.gameapp.screens.ScalableGameScreen;
-import nl.saxion.app.CsvReader;
 import org.lwjgl.system.windows.INPUT;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
