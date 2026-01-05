@@ -516,7 +516,7 @@ public class YourGameScreen extends ScalableGameScreen {
         if (!canGainLife()) {
             possibleIngredients.remove("life");
         }
-            return possibleIngredients.get(random.nextInt(possibleIngredients.size()));
+        return possibleIngredients.get(random.nextInt(possibleIngredients.size()));
     }
 
 
@@ -545,12 +545,17 @@ public class YourGameScreen extends ScalableGameScreen {
                 if (!neededIngredients.contains(ingredient.type)) {
                     if (ingredient.type.equals("life") && lives < 3) {
                         lives++;
+                    } else if (ingredient.type.equals("bomb")) {
+                        AudioControl.playSound("bad caught", soundVolume);
+                        lives = 0;
                     } else if (ingredient.type.contains("rotten")) {
                         lives = lives - 2;
                     } else if (!ingredient.type.equals("life")) {
                         AudioControl.playSound("bad caught", soundVolume);
                         lives--;
                     }
+
+
                 } else {
                     neededIngredients.remove(ingredient.type);
                     caughtIngredients.add(ingredient.type);
