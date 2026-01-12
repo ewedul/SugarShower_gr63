@@ -23,6 +23,8 @@ public class MainMenuScreen extends ScalableGameScreen {
         // Load button textures - NORMAL state
         GameApp.addTexture("start_button_normal", "textures/buttons/start_normal.png");
         GameApp.addTexture("exit_button_normal", "textures/buttons/exit_normal.png");
+        GameApp.addTexture("help", "textures/questionmark.png");
+        GameApp.addTexture("manual", "textures/manual.png");
 
         // Load button textures - SELECTED state
         GameApp.addTexture("start_button_selected", "textures/buttons/start_selected.png");
@@ -97,11 +99,17 @@ public class MainMenuScreen extends ScalableGameScreen {
         float muteY = getWorldHeight() - (float) 1.2 * muteButtonSize;
 
         Button muteButton = new Button(muteX, muteY, muteButtonSize, muteButtonSize);
+        Button helpButton = new Button(muteX, muteY-50, muteButtonSize, muteButtonSize);
 
         // Press M or click mute icon to mute audios
         if (GameApp.isKeyJustPressed(Input.Keys.M)
                 || muteButton.isButtonClicked(getMouseX(), getMouseY())) {
             AudioControl.toggleMuteMode();
+        }
+
+        if (GameApp.isKeyJustPressed(Input.Keys.H)
+                || helpButton.isButtonClicked(getMouseX(), getMouseY())) {
+            GameApp.switchScreen("ManualScreen");
         }
 
         // ===== RENDERING =====
@@ -139,6 +147,9 @@ public class MainMenuScreen extends ScalableGameScreen {
         } else {
             GameApp.drawTexture("mute-button", muteX, muteY, muteButtonSize, muteButtonSize);
         }
+        // draw help button
+        GameApp.drawTexture("help", muteX, muteY-50, muteButtonSize, muteButtonSize);
+
 
         GameApp.endSpriteRendering();
     }
@@ -153,6 +164,8 @@ public class MainMenuScreen extends ScalableGameScreen {
         GameApp.disposeTexture("start_button_selected");
         GameApp.disposeTexture("exit_button_selected");
         GameApp.disposeTexture("unmute-button");
+        GameApp.disposeTexture("help");
+        GameApp.disposeTexture("manual");
         GameApp.disposeTexture("mute-button");
     }
 }

@@ -10,6 +10,7 @@ public class Main {
         GameApp.addScreen("YourGameScreen", new YourGameScreen());
         GameApp.addScreen("GameOverScreen", new GameOverScreen());
         GameApp.addScreen("LevelCompleteScreen", new LevelCompleteScreen());
+        GameApp.addScreen("ManualScreen", new ManualScreen());
         GameApp.addScreen("VictoryScreen", new VictoryScreen());
 
         // Start game loop and show main menu screen
