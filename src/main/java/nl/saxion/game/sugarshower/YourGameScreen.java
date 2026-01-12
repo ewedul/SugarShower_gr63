@@ -43,7 +43,6 @@ public class YourGameScreen extends ScalableGameScreen {
     static ArrayList<Recipe> recipesArrayList = readCSVRecipes("src/main/resources/recipes.csv");
     ArrayList<String> ingredientTypes = readCSVIngredients("src/main/resources/ingredients.csv");
 
-
     // -- (We'll implement later, I got a bug -- Wina :))
     // recipesArrayList.get(currentLevel).recipeIngredientList;
 
@@ -337,7 +336,8 @@ public class YourGameScreen extends ScalableGameScreen {
 
         //Booklet texture
         GameApp.drawTexture("popup_gui", popupX, popupY, popupW, popupH);
-        GameApp.drawText("bubble", "Memorize this recipe! ", popupW / 9, popupH - 100, "customLine");
+        GameApp.drawText("bubble", "Memorize"+"\n"+"this recipe! ", getWorldWidth() / 4, popupH - 100, "customLine");
+
 
         // Counter texture inside speech bubble - use scaled bubble
         float counterBubbleX = popupW / 15;
@@ -346,7 +346,7 @@ public class YourGameScreen extends ScalableGameScreen {
         GameApp.drawText("bubble", String.valueOf((int) memorizeTime), (popupW / 9), popupH - 190, "customLine");
 
         // Name of the current recipe texture
-        GameApp.drawText("bubble_small", recipesArrayList.get(currentLevel - 1).name.replace("_", " "),
+        GameApp.drawText("bubble_small", recipesArrayList.get(currentLevel - 1).name.replace("_", "\n"),
                 80, 550, "customLine");
 
         // ===== LAYOUT =====
