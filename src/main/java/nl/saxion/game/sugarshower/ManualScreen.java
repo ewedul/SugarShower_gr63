@@ -1,17 +1,10 @@
 package nl.saxion.game.sugarshower;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.backends.lwjgl3.audio.Mp3;
 import nl.saxion.gameapp.GameApp;
-import nl.saxion.gameapp.gameobject.GameObject;
 import nl.saxion.gameapp.screens.ScalableGameScreen;
 
 public class ManualScreen extends ScalableGameScreen {
-    float worldWidth;
-    float worldHeight;
 
     public ManualScreen() {
         super(800, 800);
@@ -19,11 +12,9 @@ public class ManualScreen extends ScalableGameScreen {
 
     @Override
     public void show() {
-        worldWidth = GameApp.getWorldWidth();
-        worldHeight = GameApp.getWorldHeight();
 
         GameApp.addTexture("cross", "textures/cross.png");
-        GameApp.addTexture("manual", "textures/manual.png");
+        GameApp.addTexture("manual", "textures/manual_02.png");
 
     }
 
@@ -35,16 +26,7 @@ public class ManualScreen extends ScalableGameScreen {
         float crossX = getWorldWidth() - (float) 1.2 * crossButtonSize;
         float crossY = getWorldHeight() - (float) 1.2 * crossButtonSize;
 
-        // Button positions (centered horizontally)
-        float centerX = getWorldWidth() / 2;
-
-        //Use mouse input to choose
-        float mouseX = getMouseX();
-        float mouseY = getMouseY();
-
-
-
-        //Button changes size when hovering mouse over it. Click to choose.
+        //Press key X or click on X button to exit.
 
         Button crossButton = new Button(crossX, crossY, crossButtonSize, crossButtonSize);
 
@@ -66,8 +48,8 @@ public class ManualScreen extends ScalableGameScreen {
 
     @Override
     public void hide() {
-        GameApp.disposeFont("cross");
-        GameApp.disposeFont("manual");
+        GameApp.disposeTexture("cross");
+        GameApp.disposeTexture("manual");
 
     }
 }

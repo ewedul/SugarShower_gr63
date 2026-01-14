@@ -148,7 +148,7 @@ public class MainMenuScreen extends ScalableGameScreen {
             GameApp.drawTexture("mute-button", muteX, muteY, muteButtonSize, muteButtonSize);
         }
         // draw help button
-        GameApp.drawTexture("help", muteX, muteY-50, muteButtonSize, muteButtonSize);
+        GameApp.drawTexture("help", muteX, muteY- (float)1.2*muteButtonSize, muteButtonSize, muteButtonSize);
 
 
         GameApp.endSpriteRendering();
