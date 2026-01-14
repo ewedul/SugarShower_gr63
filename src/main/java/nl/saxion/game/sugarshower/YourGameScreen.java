@@ -43,8 +43,6 @@ public class YourGameScreen extends ScalableGameScreen {
     static ArrayList<Recipe> recipesArrayList = readCSVRecipes("src/main/resources/recipes.csv");
     ArrayList<String> ingredientTypes = readCSVIngredients("src/main/resources/ingredients.csv");
 
-    // -- (We'll implement later, I got a bug -- Wina :))
-    // recipesArrayList.get(currentLevel).recipeIngredientList;
 
     ArrayList<String> caughtIngredients = new ArrayList<>();
     int countIngredientsCaught;
@@ -88,8 +86,6 @@ public class YourGameScreen extends ScalableGameScreen {
         random = new Random();
         spawnTimer = 0;
         countIngredientsCaught = 0;
-
-        //ArrayList<Recipe> recipesArrayList = readCSVRecipes("src/main/resources/recipes.csv");
 
         // TEXTURES
         GameApp.addTexture("bowl", "textures/bowl.png");
@@ -175,27 +171,28 @@ public class YourGameScreen extends ScalableGameScreen {
 
         // Escape button to exit
         if (GameApp.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            GameApp.switchScreen("GameOverScreen"); //quit() method ends the game too abruptly.
+            GameApp.switchScreen("GameOverScreen");
         }
-        // Press V for Victory screen. For testing. Delete later.
-        if (GameApp.isKeyJustPressed(Input.Keys.V)) {
-            GameApp.switchScreen("VictoryScreen"); //quit() method ends the game too abruptly.
-        }
+
+        // Press V for Victory screen. Use to test VictoryScreen if adding new features.
+//        if (GameApp.isKeyJustPressed(Input.Keys.V)) {
+//            GameApp.switchScreen("VictoryScreen");
+//        }
 
         if (lives <= 0) {
             GameApp.switchScreen("GameOverScreen");
-            //Link to GameOver screen for now until we figure out the level system - Nhi
         }
+
         if (currentLevel > 15) {
             GameApp.switchScreen("VictoryScreen");
-            //Link to GameOver screen for now until we figure out the level system - Nhi
         }
 
 
         // Press M to mute audio
         if (GameApp.isKeyJustPressed(Input.Keys.M)) {
             AudioControl.toggleMuteMode();
-            GameApp.getMusic("bg-music").setVolume(AudioControl.muteMode ? 0f : bgMusicVolume);
+            GameApp.getMusic("bg-music").
+                    setVolume(AudioControl.muteMode ? 0f : bgMusicVolume);
         }
 
         //--------------------------- GRAPHIC RENDERING -------------------------------
@@ -222,10 +219,6 @@ public class YourGameScreen extends ScalableGameScreen {
                         INGREDIENT_SIZE, INGREDIENT_SIZE);
             }
         }
-
-        //just for debugging - get rid of later
-//        GameApp.drawTextHorizontallyCentered("bubble_count", String.valueOf(neededIngredients),
-//                300, 500, "customLine");
 
 
         // ===== NEW UI LAYOUT =====
@@ -573,7 +566,7 @@ public class YourGameScreen extends ScalableGameScreen {
 
                     if (currentLevel - 1 >= recipesArrayList.size()) {
                         GameApp.switchScreen("VictoryScreen");
-                        //Link to GameOver screen for now until we figure out the level system - Nhi
+
                     }
                     if (currentLevel < recipesArrayList.size()) {
                         selectRandomCustomer();
@@ -645,7 +638,7 @@ public class YourGameScreen extends ScalableGameScreen {
         ingredients.clear();
     }
 
-    // CSV methods remain the same...
+    // Load Ingredients CSV
     public ArrayList<String> readCSVIngredients(String filename) {
         ArrayList<String> ingredients = new ArrayList<>();
         CsvReader reader = new CsvReader(filename);
