@@ -45,12 +45,11 @@ public class LevelCompleteScreen extends ScalableGameScreen {
         GameApp.addTexture("next_button_selected", "textures/buttons/button2.png");
 
         // Load fonts - INCLUDING BUBBLE FONT
-        GameApp.addFont("bubble", "fonts/bubble.ttf", 40);      // Big bubble font for title
-        GameApp.addFont("bubble_small", "fonts/bubble.ttf", 25); // Smaller bubble for subtitle
-        GameApp.addFont("bubble_lists", "fonts/bubble.ttf", 15); // for ing name
-        GameApp.addFont("bubble_count", "fonts/bubble.ttf", 12); // for count
-        GameApp.addFont("roboto", "fonts/Roboto_SemiBold.ttf", 20); // For ingredient list
-
+        GameApp.addFont("roboto", "fonts/Roboto_SemiBold.ttf", 16);
+        GameApp.addFont("bubble", "fonts/bubble.ttf", 28);
+        GameApp.addFont("bubble_small", "fonts/bubble.ttf", 20);
+        GameApp.addFont("bubble_lists", "fonts/bubble.ttf", 12);
+        GameApp.addFont("bubble_count", "fonts/bubble.ttf", 10);
 
         // Load a sound
         GameApp.addSound("correct caught", "audio/correct caught.ogg");

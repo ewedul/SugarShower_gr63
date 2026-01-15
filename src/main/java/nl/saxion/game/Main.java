@@ -12,6 +12,9 @@ public class Main {
         GameApp.addScreen("LevelCompleteScreen", new LevelCompleteScreen());
         GameApp.addScreen("ManualScreen", new ManualScreen());
         GameApp.addScreen("VictoryScreen", new VictoryScreen());
+        GameApp.addScreen("InfiniteGameScreen", new InfiniteGameScreen());
+        GameApp.addScreen("InfiniteGameOverScreen", new InfiniteGameOverScreen());
+        GameApp.addScreen("InfiniteLevelCompleteScreen", new InfiniteLevelCompleteScreen());
 
         // Start game loop and show main menu screen
         GameApp.start("Sugar Shower", 800, 800, 60, false, "MainMenuScreen");
