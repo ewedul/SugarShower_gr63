@@ -15,7 +15,7 @@ public class YourGameScreen extends ScalableGameScreen {
     private static final float UI_HEIGHT = 800f;
 
     // LEVEL SYSTEM
-    static int currentLevel = 15;
+    static int currentLevel = 1;
     ArrayList<String> neededIngredientsTemp;
     static ArrayList<String> neededIngredients;
 
@@ -174,7 +174,7 @@ public class YourGameScreen extends ScalableGameScreen {
         if (GameApp.isKeyJustPressed(Input.Keys.ESCAPE)) {
             GameApp.switchScreen("GameOverScreen");
         }
-        // Press V for Victory screen. For testing. Delete later.
+        // Press V for Victory screen. Use to test VictoryScreen if adding new features.
         if (GameApp.isKeyJustPressed(Input.Keys.V)) {
             GameApp.switchScreen("VictoryScreen");
         }
@@ -189,7 +189,8 @@ public class YourGameScreen extends ScalableGameScreen {
         // Press M to mute audio
         if (GameApp.isKeyJustPressed(Input.Keys.M)) {
             AudioControl.toggleMuteMode();
-            GameApp.getMusic("bg-music").setVolume(AudioControl.muteMode ? 0f : bgMusicVolume);
+            GameApp.getMusic("bg-music").
+                    setVolume(AudioControl.muteMode ? 0f : bgMusicVolume);
         }
 
         //--------------------------- GRAPHIC RENDERING -------------------------------
@@ -345,7 +346,7 @@ public class YourGameScreen extends ScalableGameScreen {
         float listY = UI_HEIGHT - 305;
         float ingredientSize = 50;
         float rowHeight = 75;
-        float columnSpacing = 135;
+        float columnSpacing = 135; // Space between columns
 
         // Draw big finished product picture
         GameApp.drawTexture(recipesArrayList.get(currentLevel - 1).name, bigPicX, bigPicY, 254, 232);
@@ -620,7 +621,7 @@ public class YourGameScreen extends ScalableGameScreen {
         ingredients.clear();
     }
 
-    // CSV methods remain the same...
+    // Load Ingredients CSV
     public ArrayList<String> readCSVIngredients(String filename) {
         ArrayList<String> ingredients = new ArrayList<>();
         CsvReader reader = new CsvReader(filename);
