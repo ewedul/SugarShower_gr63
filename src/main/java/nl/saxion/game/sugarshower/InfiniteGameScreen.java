@@ -56,7 +56,7 @@ public class InfiniteGameScreen extends ScalableGameScreen {
 
     //POPUP -- Memorize Recipe
     boolean memorizeMode = true;
-    float memorizeTime = 5f;
+    float memorizeTime = 3.5f;
 
     // CUSTOMER SYSTEM
     private int currentCustomer = 0;
@@ -77,7 +77,7 @@ public class InfiniteGameScreen extends ScalableGameScreen {
 
         //Pop-up setup
         memorizeMode = true;
-        memorizeTime = 5f;
+        memorizeTime = 3.5f;
         GameApp.addTexture("popup_gui", "textures/infPopup.png");
 
         //BOWL

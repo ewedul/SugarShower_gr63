@@ -15,7 +15,7 @@ public class YourGameScreen extends ScalableGameScreen {
     private static final float UI_HEIGHT = 800f;
 
     // LEVEL SYSTEM
-    static int currentLevel = 15;
+    static int currentLevel = 1;
     ArrayList<String> neededIngredientsTemp;
     static ArrayList<String> neededIngredients;
 
