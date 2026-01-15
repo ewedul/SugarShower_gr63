@@ -113,7 +113,7 @@ public class MainMenuScreen extends ScalableGameScreen {
         float muteY = getWorldHeight() - (float) 1.2 * muteButtonSize;
 
         Button muteButton = new Button(muteX, muteY, muteButtonSize, muteButtonSize);
-        Button helpButton = new Button(muteX, muteY-50, muteButtonSize, muteButtonSize);
+        Button helpButton = new Button(0, getWorldHeight() - 60, muteButtonSize, muteButtonSize);
 
         // Press M or click mute icon to mute audios
         if (GameApp.isKeyJustPressed(Input.Keys.M)
@@ -177,8 +177,9 @@ public class MainMenuScreen extends ScalableGameScreen {
         } else {
             GameApp.drawTexture("mute-button", muteX, muteY, muteButtonSize, muteButtonSize);
         }
+
         // draw help button
-        GameApp.drawTexture("help", muteX, muteY- (float)1.2*muteButtonSize, muteButtonSize, muteButtonSize);
+        GameApp.drawTexture("help", 0, getWorldHeight() - 60, muteButtonSize, muteButtonSize);
 
 
         GameApp.endSpriteRendering();
