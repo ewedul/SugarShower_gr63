@@ -172,11 +172,14 @@ public class YourGameScreen extends ScalableGameScreen {
 
         // Escape button to exit
         if (GameApp.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            GameApp.switchScreen("GameOverScreen");
+            GameApp.switchScreen("MainMenuScreen");
         }
         // Press V for Victory screen. Use to test VictoryScreen if adding new features.
         if (GameApp.isKeyJustPressed(Input.Keys.V)) {
             GameApp.switchScreen("VictoryScreen");
+        }
+        if (GameApp.isKeyPressed(Input.Keys.R)) {
+            currentLevel = 1;
         }
 
         if (lives <= 0) {
