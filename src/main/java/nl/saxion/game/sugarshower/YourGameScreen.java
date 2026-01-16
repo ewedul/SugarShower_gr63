@@ -433,7 +433,7 @@ public class YourGameScreen extends ScalableGameScreen {
             int numToSpawn = random.nextInt(maxIngredientsPerSpawn - minIngredientsPerSpawn + 1)
                     + minIngredientsPerSpawn;
 
-            System.out.println("Spawning " + numToSpawn + " ingredients");
+
 
             for (int i = 0; i < numToSpawn; i++) {
                 spawnSingleIngredient(ingredientSpeed);
@@ -526,7 +526,7 @@ public class YourGameScreen extends ScalableGameScreen {
 
             if (ingredient.active && isColliding(ingredient, bowl)) {
                 ingredient.active = false;
-                System.out.println("Collected: " + ingredient.type);
+
 
                 if (!neededIngredients.contains(ingredient.type)) {
                     if (ingredient.type.equals("life") && lives < 3) {
@@ -674,7 +674,7 @@ public class YourGameScreen extends ScalableGameScreen {
         ArrayList<String> neededIngredientsTemp = new ArrayList<>(recipesArrayList.get(currentLevel - 1).recipeIngredientList);
         neededIngredients = (ArrayList) neededIngredientsTemp.clone();
         lives = 3;
-        System.out.println("set: current level: " + currentLevel);
+
     }
 
     // Draw progress bar for caught ingredients
